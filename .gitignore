@@ -3,3 +3,11 @@
 /build_windows
 # ignore CTest /Testing directory
 /Testing
+# ignore build artifacts
+*.a
+*.dll
+*.exe
+*.ilk
+*.o
+*.pdb
+*.so
