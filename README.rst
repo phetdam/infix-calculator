@@ -5,10 +5,10 @@ infix-calculator
 
 A typical command-line infix calculator.
 
-Intended as a hands-on project to get familiar with flex_ and bison_.
+Intended as a hands-on project to get familiar with Flex_ and Bison_.
 
-.. _flex: https://github.com/westes/flex
-.. _bison: https://www.gnu.org/software/bison/
+.. _Flex: https://github.com/westes/flex
+.. _Bison: https://www.gnu.org/software/bison/
 
 Features
 --------
