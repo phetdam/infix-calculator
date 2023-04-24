@@ -37,30 +37,16 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# default Flex/Bison paths, these are just the bare command names
-set(PDCALC_FLEX_PATH_DEFAULT flex)
-set(PDCALC_BISON_PATH_DEFAULT bison)
-# path to Flex and Bison. recommend using a WinFlexBison release on Windows.
-# TODO: should we use FindFLEX and FindBISON? may not work on Windows
-if(NOT DEFINED PDCALC_FLEX_PATH)
-    message(
-        STATUS
-        "PDCALC_FLEX_PATH not defined, using ${PDCALC_FLEX_PATH_DEFAULT}"
-    )
-    set(PDCALC_FLEX_PATH ${PDCALC_FLEX_PATH_DEFAULT})
-endif()
-if(NOT DEFINED PDCALC_BISON_PATH)
-    message(
-        STATUS
-        "PDCALC_BISON_PATH not defined, using ${PDCALC_BISON_PATH_DEFAULT}"
-    )
-    set(PDCALC_BISON_PATH ${PDCALC_BISON_PATH_DEFAULT})
-endif()
+# set CMake module path
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
+# find Flex + Bison
+include(FindFlexBison)
 
 # path to include directory
-set(PDCALC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(PDCALC_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 include_directories(${PDCALC_INCLUDE_DIR})
 # path to source directory
-set(PDCALC_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(PDCALC_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 
 add_subdirectory(src)
