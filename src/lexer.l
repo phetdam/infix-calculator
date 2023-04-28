@@ -29,6 +29,8 @@ IDEN           ({CHAR}|_)+({ALNUM}|_)*
 /* if we implement commands in the REPL */
 COMMAND        @{IDEN}
 WHITESPACE     [ \t\r\n]+
+LPAREN         "("
+RPAREN         ")"
 
 
 /* Rules */
@@ -40,4 +42,6 @@ WHITESPACE     [ \t\r\n]+
 {COMMAND}       printf("A command name: %s\n", yytext);
 {WHITESPACE}
 {IDEN}          printf("An identifier: %s\n", yytext);
+{LPAREN}        printf("A %s\n", yytext);
+{RPAREN}        printf("A %s\n", yytext);
 .               printf("Unrecognized: %s\n", yytext);
