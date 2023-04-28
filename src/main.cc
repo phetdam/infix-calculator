@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "pdcalc/lexer.h"
 #include "pdcalc/version.h"
 
 namespace {
@@ -31,6 +32,8 @@ const std::string program_usage{
   "Usage: " + progname + " [-h]\n"
   "\n"
   "REPL infix calculator.\n"
+  "\n"
+  "Currently, the only thing it does is tokenize input from stdin.\n"
   "\n"
   "Options:\n"
   "  -h, --help       Print this usage\n"
@@ -84,6 +87,10 @@ int main(int argc, char **argv)
     std::cout << program_version_info << std::endl;
     return EXIT_SUCCESS;
   }
-  // nothing for now
+  // run simple lexing routine. TODO: actual logic
+  yyscan_t scanner;
+  yylex_init(&scanner);
+  yylex(scanner);
+  yylex_destroy(scanner);
   return EXIT_SUCCESS;
 }
