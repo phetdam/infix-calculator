@@ -73,6 +73,8 @@ add_compile_definitions(
 # path to include directory
 set(PDCALC_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 include_directories(${PDCALC_INCLUDE_DIR})
+# name of namespaced include directory
+set(PDCALC_NAMESPACE_INCLUDE_DIR ${PDCALC_INCLUDE_DIR}/pdcalc)
 # path to source directory
 set(PDCALC_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 
