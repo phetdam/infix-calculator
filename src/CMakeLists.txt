@@ -33,10 +33,10 @@ add_custom_command(
 # generate scanner using Flex. header goes to include dir, source to src dir
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_SOURCE}
-    # TODO: add --bison-bridge to work with Bison parser
     # don't define yywrap, just assume EOF is end of input. note Flex input
     # sets never-interactive as without it, isatty() is still used to handle
     # interactive input and will result in -Wimplicit-function-declaration.
+    # also no need for bison-bridge if we are using the C++ Bison parser.
     COMMAND
         ${PDCALC_FLEX} -CFe --noyywrap --nounistd --warn
             --header-file=${PDCALC_NAMESPACE_INCLUDE_DIR}/${PDCALC_LEXER_HEADER}
