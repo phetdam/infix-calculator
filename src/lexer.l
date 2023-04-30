@@ -6,6 +6,11 @@
  * Copyright: MIT License
  */
 
+/* lexer is never going to be used interactively and is reentrant. we don't
+ * generate the input() and yyunput() functions as well for this reason.
+ */
+%option noinput nounput never-interactive reentrant
+
 %{
     #include <stdio.h>
     #include <stdlib.h>

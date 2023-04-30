@@ -12,11 +12,11 @@ set(PDCALC_PARSER_SOURCE ${PDCALC_PARSER_PREFIX}.yy.c)
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_SOURCE}
     # TODO: add --bison-bridge to work with Bison parser
-    # don't define yywrap, just assume EOF is end of input. --nounistd without
-    # --never-interactive means isatty() is still used to handle interactive
-    # input and will result in -Wimplicit-function-declaration.
+    # don't define yywrap, just assume EOF is end of input. note Flex input
+    # sets never-interactive as without it, isatty() is still used to handle
+    # interactive input and will result in -Wimplicit-function-declaration.
     COMMAND
-        ${PDCALC_FLEX} -R -CFe --noyywrap --nounistd --warn --never-interactive
+        ${PDCALC_FLEX} -CFe --noyywrap --nounistd --warn
             --header-file=${PDCALC_NAMESPACE_INCLUDE_DIR}/${PDCALC_LEXER_HEADER}
             -o ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_SOURCE}
             ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_INPUT}
