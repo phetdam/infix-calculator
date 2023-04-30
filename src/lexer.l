@@ -14,6 +14,11 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
+
+    /**
+     * Standard action for a token that echoes it to stdout.
+     */
+    #define PDCALC_ECHO_TOKEN() printf("A %s\n", yytext)
 %}
 
 /* Token definitions */
@@ -47,6 +52,7 @@ RPAREN         ")"
 {COMMAND}       printf("A command name: %s\n", yytext);
 {WHITESPACE}
 {IDEN}          printf("An identifier: %s\n", yytext);
-{LPAREN}        printf("A %s\n", yytext);
-{RPAREN}        printf("A %s\n", yytext);
+{LPAREN}        PDCALC_ECHO_TOKEN();
+{RPAREN}        PDCALC_ECHO_TOKEN();
+"="             PDCALC_ECHO_TOKEN();
 .               printf("Unrecognized: %s\n", yytext);
