@@ -6,7 +6,7 @@
  * Copyright: MIT License
  */
 
-/* lexer is never going to be used interactively and is reentrant. we don't
+/* Lexer is never going to be used interactively and is reentrant. We don't
  * generate the input() and yyunput() functions as well for this reason.
  */
 %option noinput nounput never-interactive reentrant
@@ -14,7 +14,18 @@
 %{
     #include <stdio.h>
 
+    // MSVC complains that stdint.h is redefining fixed-width integral type
+    // macros like INT8_MIN, UINT32_MAX, etc. so disable this warning
+    #ifdef _MSC_VER
+    #pragma warning (push)
+    #pragma warning (disable: 4005)
+    #endif  // _MSC_VER
     #include <string>
+    #ifdef _MSC_VER
+    #pragma warning (pop)
+    #endif  // _MSC_VER
+
+    #include "pdcalc/parser.h"
 
     /**
      * Standard action for a token that echoes it to stdout.
@@ -34,10 +45,10 @@ MAYBE_ALNUMS   {ALNUM}*
 DIGITS         {DIGIT}+
 MAYBE_DIGITS   {DIGIT}*
 INT            [-+]?{DIGITS}
-/* note that we allow a trailing . here */
+/* Note that we allow a trailing . here */
 FLOAT          {INT}"."{MAYBE_DIGITS}
 IDEN           ({CHAR}|_)+({ALNUM}|_)*
-/* if we implement commands in the REPL */
+/* If we implement commands in the REPL */
 COMMAND        @{IDEN}
 WHITESPACE     [ \t\r\n]+
 LPAREN         "("

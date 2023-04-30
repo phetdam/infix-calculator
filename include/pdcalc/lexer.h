@@ -8,12 +8,7 @@
 #ifndef PDCALC_LEXER_H_
 #define PDCALC_LEXER_H_
 
-// MSVC complains that macros for fixed-size integral types are being redefined
-#ifdef _WIN32
-#include <stdint.h>
-#endif  // _WIN32
-
-// note: if compiling lexer as C code, need PDCALC_EXTERN_C_(BEGIM|END) wrapper
+// note: if compiling lexer as C code, need PDCALC_EXTERN_C_(BEGIM|END) guards
 #include "pdcalc/lexer.yy.h"
 
 #endif  // PDCALC_LEXER_H_
