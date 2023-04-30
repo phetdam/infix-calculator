@@ -2,7 +2,7 @@
  * lexer.l
  *
  * Author: Derek Huang
- * Summary: pdcalc Flex input
+ * Summary: pdcalc C++ Flex input
  * Copyright: MIT License
  */
 
@@ -13,7 +13,8 @@
 
 %{
     #include <stdio.h>
-    #include <stdlib.h>
+
+    #include <string>
 
     /**
      * Standard action for a token that echoes it to stdout.
@@ -47,8 +48,8 @@ RPAREN         ")"
 
 %%
 
-{INT}           printf("An integer: %s (%ld)\n", yytext, atol(yytext));
-{FLOAT}         printf("A float: %s (%g)\n", yytext, atof(yytext));
+{INT}           printf("An integer: %s (%ld)\n", yytext, std::stol(yytext));
+{FLOAT}         printf("A float: %s (%g)\n", yytext, std::stod(yytext));
 {COMMAND}       printf("A command name: %s\n", yytext);
 {WHITESPACE}
 {IDEN}          printf("An identifier: %s\n", yytext);

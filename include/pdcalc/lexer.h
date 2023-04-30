@@ -1,19 +1,19 @@
 /**
  * @file lexer.h
  * @author Derek Huang
- * @brief C++ compatibility header for the Flex-generated lexer header
+ * @brief C++ wrapper header for the Flex-generated lexer header
  * @copyright MIT License
  */
 
 #ifndef PDCALC_LEXER_H_
 #define PDCALC_LEXER_H_
 
-#include "pdcalc/common.h"
+// MSVC complains that macros for fixed-size integral types are being redefined
+#ifdef _WIN32
+#include <stdint.h>
+#endif  // _WIN32
 
-PDCALC_EXTERN_C_BEGIN
-
+// note: if compiling lexer as C code, need PDCALC_EXTERN_C_(BEGIM|END) wrapper
 #include "pdcalc/lexer.yy.h"
-
-PDCALC_EXTERN_C_END
 
 #endif  // PDCALC_LEXER_H_
