@@ -11,6 +11,7 @@
 *.o
 *.pdb
 *.so
-# ignore Flex/Bison generated files
+# ignore Flex/Bison generated C/C++ files
 *.yy.c
+*.yy.cc
 *.yy.h
