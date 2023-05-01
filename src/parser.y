@@ -23,7 +23,6 @@
 
 /* Token definitions */
 %token <double> FLOATING
-/* TODO: INTEGRAL unused */
 %token <long> INTEGRAL
 %token <bool> TRUTH
 %token PIPE "|"
@@ -45,6 +44,7 @@
 %left "<<" ">>"
 %left "+" "-"
 %left "*" "/" "%"
+%right "!" "~"
 
 /* Non-terminal type declarations.
  *
@@ -56,6 +56,7 @@
  */
 %nterm <double> d_expr
 %nterm <bool> b_expr
+%nterm <int> i_expr
 
 %%
 
@@ -67,22 +68,45 @@ input:
 /* line rule */
 line:
   "\n"
+| i_expr "\n"   { std::cout << $1 << std::endl; }
 | d_expr "\n"   { std::cout << $1 << std::endl; }
 | b_expr "\n"   {
                   std::cout << std::boolalpha << $1 << std::noboolalpha <<
                     std::endl;
                 }
 
-/* TODO: integral expression rule */
+/* Integral expression rule */
+i_expr:
+  INTEGRAL                          { $$ = $1; }
+| "(" i_expr[expr] ")"              { $$ = $expr; }
+| i_expr[left] "+" i_expr[right]    { $$ = $left + $right; }
+| i_expr[left] "-" i_expr[right]    { $$ = $left - $right; }
+| i_expr[left] "*" i_expr[right]    { $$ = $left * $right; }
+| i_expr[left] "/" i_expr[right]    { $$ = $left / $right; }
+| i_expr[left] "%" i_expr[right]    { $$ = $left % $right; }
+| i_expr[left] "&" i_expr[right]    { $$ = $left & $right; }
+| i_expr[left] "^" i_expr[right]    { $$ = $left ^ $right; }
+| i_expr[left] "|" i_expr[right]    { $$ = $left | $right; }
+| "~" i_expr[expr]                  { $$ = ~$expr; }
 
 /* Float arithmetic expression rule */
 d_expr:
-  FLOATING                            { $$ = $1; }
+  FLOATING                          { $$ = $1; }
 | "(" d_expr[expr] ")"              { $$ = $expr; }
 | d_expr[left] "+" d_expr[right]    { $$ = $left + $right; }
 | d_expr[left] "-" d_expr[right]    { $$ = $left - $right; }
 | d_expr[left] "*" d_expr[right]    { $$ = $left * $right; }
 | d_expr[left] "/" d_expr[right]    { $$ = $left / $right; }
+/* promoting right i_expr */
+| d_expr[left] "+" i_expr[right]    { $$ = $left + $right; }
+| d_expr[left] "-" i_expr[right]    { $$ = $left - $right; }
+| d_expr[left] "*" i_expr[right]    { $$ = $left * $right; }
+| d_expr[left] "/" i_expr[right]    { $$ = $left / $right; }
+/* promoting left i_expr */
+| i_expr[left] "+" d_expr[right]    { $$ = $left + $right; }
+| i_expr[left] "-" d_expr[right]    { $$ = $left - $right; }
+| i_expr[left] "*" d_expr[right]    { $$ = $left * $right; }
+| i_expr[left] "/" d_expr[right]    { $$ = $left / $right; }
 
 /* Boolean expression rule */
 b_expr:
@@ -90,9 +114,11 @@ b_expr:
 | "(" b_expr[expr] ")"                { $$ = $expr; }
 | d_expr[left] "==" d_expr[right]     { $$ = ($left == $right); }
 | d_expr[left] "!=" d_expr[right]     { $$ = ($left != $right); }
-/* TODO: add additional truth-testing for d_expr */
+| i_expr[left] "==" i_expr[right]     { $$ = ($left == $right); }
+| i_expr[left] "!=" i_expr[right]     { $$ = ($left != $right); }
 | b_expr[left] "==" b_expr[right]     { $$ = ($left == $right); }
 | b_expr[left] "!=" b_expr[right]     { $$ = ($left != $right); }
+| "!" b_expr[expr]                    { $$ = !$expr; }
 
 %%
 
