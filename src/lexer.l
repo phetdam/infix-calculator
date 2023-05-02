@@ -89,5 +89,6 @@ RPAREN         ")"
 "=="                    return yy::parser::make_EQUALS();
 .                       {
                           throw yy::parser::syntax_error{
-                            "Unrecognized token '" + std::string{yytext} + '"'};
+                            "Unrecognized token '" + std::string{yytext} + '"'
+                          };
                         }
