@@ -10,16 +10,17 @@
     #include <ios>
     #include <iostream>
 
-    #include "pdcalc/lexer.h"
+    #include "pdcalc/parser.h"
 %}
 
-/* C++ LR parser using variants.
+/* C++ LR parser using variants handling complete symbols.
  *
  * Requiring Bison 3.2 stops unnecessary stack.hh generation.
  */
 %require "3.2"
 %language "c++"
 %define api.value.type variant
+%define api.token.constructor
 
 /* Token definitions */
 %token <double> FLOATING

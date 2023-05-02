@@ -30,7 +30,7 @@ add_custom_command(
     COMMENT "Running Bison to build parser ${PDCALC_PARSER_SOURCE}"
     VERBATIM
 )
-# generate scanner using Flex. header goes to include dir, source to src dir
+# generate scanner using Flex. source goes to src dir
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_SOURCE}
     # don't define yywrap, just assume EOF is end of input. note Flex input
@@ -39,7 +39,6 @@ add_custom_command(
     # also no need for bison-bridge if we are using the C++ Bison parser.
     COMMAND
         ${PDCALC_FLEX} -CFe --noyywrap --nounistd --warn
-            --header-file=${PDCALC_NAMESPACE_INCLUDE_DIR}/${PDCALC_LEXER_HEADER}
             -o ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_SOURCE}
             ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_INPUT}
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_INPUT}

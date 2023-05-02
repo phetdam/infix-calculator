@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "pdcalc/lexer.h"
+#include "pdcalc/parser.h"
 #include "pdcalc/version.h"
 
 namespace {
@@ -87,10 +87,7 @@ int main(int argc, char **argv)
     std::cout << program_version_info << std::endl;
     return EXIT_SUCCESS;
   }
-  // run simple lexing routine. TODO: actual logic
-  yyscan_t scanner;
-  yylex_init(&scanner);
-  yylex(scanner);
-  yylex_destroy(scanner);
+  // run simple lexing routine reporting on all the tokens. TODO: actual logic
+  yylex();
   return EXIT_SUCCESS;
 }

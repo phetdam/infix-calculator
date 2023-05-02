@@ -6,10 +6,11 @@
  * Copyright: MIT License
  */
 
-/* Lexer is never going to be used interactively and is reentrant. We don't
- * generate the input() and yyunput() functions as well for this reason.
+/* Lexer is never going to be used interactively but is non-reetrant. We don't
+ * generate the input() and yyunput() functions since it will not be
+ * interactive and must make lexer non-reentrant to work with C++ Bison parser.
  */
-%option noinput nounput never-interactive reentrant
+%option noinput nounput never-interactive
 
 %{
     #include <stdio.h>
@@ -62,7 +63,10 @@ RPAREN         ")"
 %%
 
 {INT}           printf("An integer: %s (%ld)\n", yytext, std::stol(yytext));
-{FLOAT}         printf("A float: %s (%g)\n", yytext, std::stod(yytext));
+{FLOAT}         {
+                  printf("A float: %s (%g)\n", yytext, std::stod(yytext));
+                  // return yy::parser::make_FLOATING(std::stod(yytext));
+                }
 {COMMAND}       printf("A command name: %s\n", yytext);
 {WHITESPACE}
 {IDEN}          printf("An identifier: %s\n", yytext);
