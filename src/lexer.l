@@ -66,12 +66,19 @@ RPAREN         ")"
 {FLOAT}         return yy::parser::make_FLOATING(std::stod(yytext));
 "+"             return yy::parser::make_PLUS();
 "-"             return yy::parser::make_MINUS();
+"*"             return yy::parser::make_STAR();
+"/"             return yy::parser::make_SLASH();
+"%"             return yy::parser::make_PERCENT();
+"true"          return yy::parser::make_TRUTH(true);
+"false"         return yy::parser::make_TRUTH(false);
+";"             return yy::parser::make_SEMICOLON();
+"!"             return yy::parser::make_NOT();
 {COMMAND}       printf("A command name: %s\n", yytext);
 {WHITESPACE}
 {IDEN}          printf("An identifier: %s\n", yytext);
 "("             return yy::parser::make_LPAREN();
 ")"             return yy::parser::make_RPAREN();
-"="             PDCALC_ECHO_TOKEN();
+"=="            return yy::parser::make_EQUALS();
 .               {
                   throw yy::parser::syntax_error{
                     "Unrecognized token '" + std::string{yytext} + '"'};

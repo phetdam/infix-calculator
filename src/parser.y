@@ -13,14 +13,16 @@
     #include "pdcalc/parser.h"
 %}
 
-/* C++ LR parser using variants handling complete symbols.
+/* C++ LR parser using variants handling complete symbols with error reporting.
  *
- * Requiring Bison 3.2 stops unnecessary stack.hh generation.
+ * Requiring Bison 3.2 stops unnecessary stack.hh generation. For Bison 3.6+,
+ * it is better for parse.error to have the value of detailed.
  */
 %require "3.2"
 %language "c++"
 %define api.value.type variant
 %define api.token.constructor
+%define parse.error verbose
 
 /* Token definitions */
 %token <double> FLOATING
@@ -38,6 +40,10 @@
 %token PERCENT "%"
 %token LPAREN "("
 %token RPAREN ")"
+%token EQUALS "=="
+%token NOT "!"
+%token NOT_EQUALS "!="
+%token SEMICOLON ";"
 
 /* Associativity and precedence declarations (C-style) */
 %left "|"
@@ -63,19 +69,20 @@
 
 %%
 
-/* input rule */
+/* Input rule */
 input:
   %empty
-| input line
+| input stmt
 
-/* line rule */
-line:
-  i_expr  { std::cout << "<long>   " << $1 << std::endl; }
-| d_expr  { std::cout << "<double> " << $1 << std::endl; }
-| b_expr  {
-            std::cout << "<bool>   " << std::boolalpha << $1 <<
-              std::noboolalpha << std::endl;
-          }
+/* Statement rule */
+stmt:
+  ";"           /* empty statement */
+| i_expr ";"    { std::cout << "<long>   " << $1 << std::endl; }
+| d_expr ";"    { std::cout << "<double> " << $1 << std::endl; }
+| b_expr ";"    {
+                  std::cout << "<bool>   " << std::boolalpha << $1 <<
+                    std::noboolalpha << std::endl;
+                }
 
 /* Integral expression rule */
 i_expr:
@@ -118,6 +125,12 @@ b_expr:
 | d_expr[left] "!=" d_expr[right]     { $$ = ($left != $right); }
 | i_expr[left] "==" i_expr[right]     { $$ = ($left == $right); }
 | i_expr[left] "!=" i_expr[right]     { $$ = ($left != $right); }
+/* d_expr left, i_expr right */
+| d_expr[left] "==" i_expr[right]     { $$ = ($left == $right); }
+| d_expr[left] "!=" i_expr[right]     { $$ = ($left != $right); }
+/* i_expr left, d_expr right */
+| i_expr[left] "==" d_expr[right]     { $$ = ($left == $right); }
+| i_expr[left] "!=" d_expr[right]     { $$ = ($left != $right); }
 | b_expr[left] "==" b_expr[right]     { $$ = ($left == $right); }
 | b_expr[left] "!=" b_expr[right]     { $$ = ($left != $right); }
 | "!" b_expr[expr]                    { $$ = !$expr; }
@@ -129,8 +142,7 @@ namespace yy {
 /**
  * User-defined error handler.
  *
- * Currently, all it does is print the exception message. The details of the
- * message are somewhat reliant on the tokenizer to generate something.
+ * Currently, all it does is print the exception message.
  *
  * @param message Bison exception error message
  */

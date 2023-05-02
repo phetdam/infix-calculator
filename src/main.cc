@@ -31,9 +31,10 @@ const std::string program_version_info{
 const std::string program_usage{
   "Usage: " + progname + " [-h]\n"
   "\n"
-  "REPL infix calculator.\n"
+  "A statement-based infix calculator reading from stdin.\n"
   "\n"
-  "Currently, the only thing it does is tokenize input from stdin.\n"
+  "Reads arithmetic or logical expression statements from stdin and prints\n"
+  "the results, prepended by the type, to stdout.\n"
   "\n"
   "Options:\n"
   "  -h, --help       Print this usage\n"
@@ -90,7 +91,7 @@ int main(int argc, char **argv)
   // run simple lexing routine reporting on all the tokens
   // while (yylex().type_get())
   //   ;
-  // parser input and generate output
+  // parser input and generate output. TODO: support explicit read from file
   yy::parser parser;
 // support parser operation tracing
 #if YYDEBUG
