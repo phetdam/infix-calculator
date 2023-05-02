@@ -36,6 +36,11 @@
     #define PDCALC_ECHO_TOKEN() printf("A %s\n", yytext)
 %}
 
+/* Start conditions */
+
+/* Python-style "#" comment */
+%x LINE_COMMENT
+
 /* Token definitions */
 
 DIGIT          [0-9]
@@ -62,24 +67,27 @@ RPAREN         ")"
 
 %%
 
-{INT}           return yy::parser::make_INTEGRAL(std::stol(yytext));
-{FLOAT}         return yy::parser::make_FLOATING(std::stod(yytext));
-"+"             return yy::parser::make_PLUS();
-"-"             return yy::parser::make_MINUS();
-"*"             return yy::parser::make_STAR();
-"/"             return yy::parser::make_SLASH();
-"%"             return yy::parser::make_PERCENT();
-"true"          return yy::parser::make_TRUTH(true);
-"false"         return yy::parser::make_TRUTH(false);
-";"             return yy::parser::make_SEMICOLON();
-"!"             return yy::parser::make_NOT();
-{COMMAND}       printf("A command name: %s\n", yytext);
+{INT}                   return yy::parser::make_INTEGRAL(std::stol(yytext));
+{FLOAT}                 return yy::parser::make_FLOATING(std::stod(yytext));
+"+"                     return yy::parser::make_PLUS();
+"-"                     return yy::parser::make_MINUS();
+"*"                     return yy::parser::make_STAR();
+"/"                     return yy::parser::make_SLASH();
+"%"                     return yy::parser::make_PERCENT();
+"true"                  return yy::parser::make_TRUTH(true);
+"false"                 return yy::parser::make_TRUTH(false);
+";"                     return yy::parser::make_SEMICOLON();
+"!"                     return yy::parser::make_NOT();
+"#"                     BEGIN(LINE_COMMENT);
+<LINE_COMMENT>[^\n]*
+<LINE_COMMENT>\n        BEGIN(INITIAL);
+{COMMAND}               printf("A command name: %s\n", yytext);
 {WHITESPACE}
-{IDEN}          printf("An identifier: %s\n", yytext);
-"("             return yy::parser::make_LPAREN();
-")"             return yy::parser::make_RPAREN();
-"=="            return yy::parser::make_EQUALS();
-.               {
-                  throw yy::parser::syntax_error{
-                    "Unrecognized token '" + std::string{yytext} + '"'};
-                }
+{IDEN}                  printf("An identifier: %s\n", yytext);
+"("                     return yy::parser::make_LPAREN();
+")"                     return yy::parser::make_RPAREN();
+"=="                    return yy::parser::make_EQUALS();
+.                       {
+                          throw yy::parser::syntax_error{
+                            "Unrecognized token '" + std::string{yytext} + '"'};
+                        }
