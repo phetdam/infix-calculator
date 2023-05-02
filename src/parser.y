@@ -36,6 +36,8 @@
 %token STAR "*"
 %token SLASH "/"
 %token PERCENT "%"
+%token LPAREN "("
+%token RPAREN ")"
 
 /* Associativity and precedence declarations (C-style) */
 %left "|"
@@ -68,13 +70,12 @@ input:
 
 /* line rule */
 line:
-  "\n"
-| i_expr "\n"   { std::cout << $1 << std::endl; }
-| d_expr "\n"   { std::cout << $1 << std::endl; }
-| b_expr "\n"   {
-                  std::cout << std::boolalpha << $1 << std::noboolalpha <<
-                    std::endl;
-                }
+  i_expr  { std::cout << "<long>   " << $1 << std::endl; }
+| d_expr  { std::cout << "<double> " << $1 << std::endl; }
+| b_expr  {
+            std::cout << "<bool>   " << std::boolalpha << $1 <<
+              std::noboolalpha << std::endl;
+          }
 
 /* Integral expression rule */
 i_expr:
@@ -128,7 +129,8 @@ namespace yy {
 /**
  * User-defined error handler.
  *
- * Currently, all it does is print the exception message.
+ * Currently, all it does is print the exception message. The details of the
+ * message are somewhat reliant on the tokenizer to generate something.
  *
  * @param message Bison exception error message
  */

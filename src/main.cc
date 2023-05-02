@@ -87,7 +87,15 @@ int main(int argc, char **argv)
     std::cout << program_version_info << std::endl;
     return EXIT_SUCCESS;
   }
-  // run simple lexing routine reporting on all the tokens. TODO: actual logic
-  yylex();
+  // run simple lexing routine reporting on all the tokens
+  // while (yylex().type_get())
+  //   ;
+  // parser input and generate output
+  yy::parser parser;
+// support parser operation tracing
+#if YYDEBUG
+  parser.set_debug_level(1);
+#endif  // YYDEBUG
+  parser();
   return EXIT_SUCCESS;
 }

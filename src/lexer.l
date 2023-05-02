@@ -62,15 +62,17 @@ RPAREN         ")"
 
 %%
 
-{INT}           printf("An integer: %s (%ld)\n", yytext, std::stol(yytext));
-{FLOAT}         {
-                  printf("A float: %s (%g)\n", yytext, std::stod(yytext));
-                  // return yy::parser::make_FLOATING(std::stod(yytext));
-                }
+{INT}           return yy::parser::make_INTEGRAL(std::stol(yytext));
+{FLOAT}         return yy::parser::make_FLOATING(std::stod(yytext));
+"+"             return yy::parser::make_PLUS();
+"-"             return yy::parser::make_MINUS();
 {COMMAND}       printf("A command name: %s\n", yytext);
 {WHITESPACE}
 {IDEN}          printf("An identifier: %s\n", yytext);
-{LPAREN}        PDCALC_ECHO_TOKEN();
-{RPAREN}        PDCALC_ECHO_TOKEN();
+"("             return yy::parser::make_LPAREN();
+")"             return yy::parser::make_RPAREN();
 "="             PDCALC_ECHO_TOKEN();
-.               printf("Unrecognized: %s\n", yytext);
+.               {
+                  throw yy::parser::syntax_error{
+                    "Unrecognized token '" + std::string{yytext} + '"'};
+                }
