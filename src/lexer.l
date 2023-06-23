@@ -52,7 +52,7 @@ ALNUMS         {ALNUM}+
 MAYBE_ALNUMS   {ALNUM}*
 DIGITS         {DIGIT}+
 MAYBE_DIGITS   {DIGIT}*
-INT            [-+]?{DIGITS}
+INT            -?{DIGITS}
 /* Note that we allow a trailing . here */
 FLOAT          {INT}"."{MAYBE_DIGITS}
 IDEN           ({CHAR}|_)+({ALNUM}|_)*
