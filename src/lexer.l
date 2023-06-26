@@ -83,6 +83,8 @@ RPAREN         ")"
 "true"                  return yy::parser::make_TRUTH(true);
 "false"                 return yy::parser::make_TRUTH(false);
 ";"                     return yy::parser::make_SEMICOLON();
+"&&"                    return yy::parser::make_AND();
+"||"                    return yy::parser::make_OR();
 "!"                     return yy::parser::make_NOT();
 "#"                     BEGIN(LINE_COMMENT);
 <LINE_COMMENT>[^\n]*

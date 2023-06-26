@@ -42,6 +42,8 @@
 %token LPAREN "("
 %token RPAREN ")"
 %token EQUALS "=="
+%token AND "&&"
+%token OR "||"
 %token NOT "!"
 %token LANGLE "<"
 %token RANGLE ">"
@@ -124,6 +126,13 @@ d_expr:
 b_expr:
   TRUTH                               { $$ = $1; }
 | "(" b_expr[expr] ")"                { $$ = $expr; }
+/* b_expr comparisons */
+| b_expr[left] "==" b_expr[right]     { $$ = ($left == $right); }
+| b_expr[left] "!=" b_expr[right]     { $$ = ($left == $right); }
+| b_expr[left] "||" b_expr[right]     { $$ = ($left || $right); }
+| b_expr[left] "&&" b_expr[right]     { $$ = ($left && $right); }
+| "!" b_expr[expr]                    { $$ = !$expr; }
+/* d_expr, i_expr comparisons */
 | d_expr[left] "==" d_expr[right]     { $$ = ($left == $right); }
 | d_expr[left] "!=" d_expr[right]     { $$ = ($left != $right); }
 | i_expr[left] "==" i_expr[right]     { $$ = ($left == $right); }
@@ -134,9 +143,6 @@ b_expr:
 /* i_expr left, d_expr right */
 | i_expr[left] "==" d_expr[right]     { $$ = ($left == $right); }
 | i_expr[left] "!=" d_expr[right]     { $$ = ($left != $right); }
-| b_expr[left] "==" b_expr[right]     { $$ = ($left == $right); }
-| b_expr[left] "!=" b_expr[right]     { $$ = ($left != $right); }
-| "!" b_expr[expr]                    { $$ = !$expr; }
 
 %%
 
