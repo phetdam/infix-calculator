@@ -1,0 +1,2 @@
+# don't include *.in.* files used as pdcalc input in language stats
+*.in.* -linguist-detectable
