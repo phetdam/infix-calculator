@@ -51,6 +51,8 @@
 %token SEMICOLON ";"
 
 /* Associativity and precedence declarations (C-style) */
+%left "||"
+%left "&&"
 %left "|"
 %left "^"
 %left "&"
