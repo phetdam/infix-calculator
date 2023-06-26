@@ -82,6 +82,34 @@ bool parse_args(cliopt_map& opt_map, int argc, char **argv)
   return true;
 }
 
+/**
+ * Parse the given input file paths.
+ *
+ * @param input_files Input file paths
+ * @returns `EXIT_SUCCESS` if successful, `EXIT_FAILURE` on error
+ */
+int parse_files(const std::vector<std::string>& input_files)
+{
+  for (const auto& input_file : input_files) {
+    // get C file stream for input file + handle any errors
+    auto input_stream = std::fopen(input_file.c_str(), "r");
+    if (!input_stream) {
+      std::cerr << progname << ": error: " << input_file << ": " <<
+        std::strerror(errno) << std::endl;
+      return EXIT_FAILURE;
+    }
+    // reset yyin using file stream and parse
+    yyin = input_stream;
+    yy::parser parser;
+// support parser operation tracing
+#if YYDEBUG
+    parser.set_debug_level(1);
+#endif  // YYDEBUG
+    parser();
+  }
+  return EXIT_SUCCESS;
+}
+
 }  // namespace
 
 int main(int argc, char **argv)
@@ -101,26 +129,8 @@ int main(int argc, char **argv)
     return EXIT_SUCCESS;
   }
   // process input files
-  if (opt_map.find("file") != opt_map.end()) {
-    for (const auto& input_file : opt_map.at("file")) {
-      // get C file stream for input file + handle any errors
-      auto input_stream = std::fopen(input_file.c_str(), "r");
-      if (!input_stream) {
-        std::cerr << progname << ": error: " << input_file << ": " <<
-          std::strerror(errno) << std::endl;
-        return EXIT_FAILURE;
-      }
-      // reset yyin using file stream and parse
-      yyin = input_stream;
-      yy::parser parser;
-// support parser operation tracing
-#if YYDEBUG
-      parser.set_debug_level(1);
-#endif  // YYDEBUG
-      parser();
-    }
-    return EXIT_SUCCESS;
-  }
+  if (opt_map.find("file") != opt_map.end())
+    return parse_files(opt_map.at("file"));
   // run simple lexing routine reporting on all the tokens
   // while (yylex().type_get())
   //   ;
