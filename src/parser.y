@@ -31,6 +31,7 @@
 %token PIPE "|"
 %token CARET "^"
 %token AMPERSAND "&"
+%token TILDE "~"
 %token LSHIFT "<<"
 %token RSHIFT ">>"
 %token PLUS "+"
@@ -42,6 +43,8 @@
 %token RPAREN ")"
 %token EQUALS "=="
 %token NOT "!"
+%token LANGLE "<"
+%token RANGLE ">"
 %token NOT_EQUALS "!="
 %token SEMICOLON ";"
 
@@ -95,6 +98,8 @@ i_expr:
 | i_expr[left] "^" i_expr[right]    { $$ = $left ^ $right; }
 | i_expr[left] "|" i_expr[right]    { $$ = $left | $right; }
 | "~" i_expr[expr]                  { $$ = ~$expr; }
+| i_expr[left] "<<" i_expr[right]   { $$ = $left << $right; }
+| i_expr[left] ">>" i_expr[right]   { $$ = $left >> $right; }
 
 /* Float arithmetic expression rule */
 d_expr:

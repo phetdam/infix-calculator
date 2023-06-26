@@ -74,6 +74,12 @@ RPAREN         ")"
 "*"                     return yy::parser::make_STAR();
 "/"                     return yy::parser::make_SLASH();
 "%"                     return yy::parser::make_PERCENT();
+"|"                     return yy::parser::make_PIPE();
+"&"                     return yy::parser::make_AMPERSAND();
+"^"                     return yy::parser::make_CARET();
+"~"                     return yy::parser::make_TILDE();
+"<<"                    return yy::parser::make_LSHIFT();
+">>"                    return yy::parser::make_RSHIFT();
 "true"                  return yy::parser::make_TRUTH(true);
 "false"                 return yy::parser::make_TRUTH(false);
 ";"                     return yy::parser::make_SEMICOLON();
@@ -81,9 +87,9 @@ RPAREN         ")"
 "#"                     BEGIN(LINE_COMMENT);
 <LINE_COMMENT>[^\n]*
 <LINE_COMMENT>\n        BEGIN(INITIAL);
-{COMMAND}               printf("A command name: %s\n", yytext);
+  /* {COMMAND}               printf("A command name: %s\n", yytext); */
 {WHITESPACE}
-{IDEN}                  printf("An identifier: %s\n", yytext);
+  /*{IDEN}                  printf("An identifier: %s\n", yytext); */
 "("                     return yy::parser::make_LPAREN();
 ")"                     return yy::parser::make_RPAREN();
 "=="                    return yy::parser::make_EQUALS();
