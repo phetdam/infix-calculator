@@ -57,8 +57,6 @@
 
 /* Non-terminal type declarations.
  *
- * TODO: Add i_expr and implement rules.
- *
  * b_expr -- Boolean expression (bool)
  * d_expr -- Float arithmetic expression (double)
  * i_expr -- Integral arithmetic expression (long)
