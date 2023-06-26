@@ -13,11 +13,10 @@ Intended as a hands-on project to get familiar with Flex_ and Bison_.
 Features
 --------
 
-Can process expression input from both stdin and text files. Supports boolean,
-integral, and floating point expressions using standard arithmetic and logical
-operations, with C-style operator precedence. Allows line comments within input
-files, multiple semicolon-separated expressions in input, and grouping of
-subexpressions with parentheses.
+Can process semicolon-terminated expression input from both stdin and text
+files. Supports boolean, integral, and floating point expressions using standard
+arithmetic and logical operations, with C-style operator precedence. Allows line
+comments within input files and grouping of subexpressions with parentheses.
 
 Maybe in the future I will be able to support name assignment.
 
