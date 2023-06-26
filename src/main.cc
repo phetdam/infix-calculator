@@ -5,14 +5,18 @@
  * @copyright MIT License
  */
 
+#include <cerrno>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
 
+#include "pdcalc/lexer.h"
 #include "pdcalc/parser.h"
 #include "pdcalc/version.h"
 
@@ -29,12 +33,12 @@ const std::string program_version_info{
   pdcalc::system_version + ")"
 };
 const std::string program_usage{
-  "Usage: " + progname + " [-h]\n"
+  "Usage: " + progname + " [-h] [-V] [FILE...]\n"
   "\n"
-  "A statement-based infix calculator reading from stdin.\n"
+  "A statement-based infix calculator.\n"
   "\n"
-  "Reads arithmetic or logical expression statements from stdin and prints\n"
-  "the results, prepended by the type, to stdout.\n"
+  "Reads arithmetic or logical expression statements from files or stdin and\n"
+  "prints the results, prepended by the type, to stdout.\n"
   "\n"
   "Options:\n"
   "  -h, --help       Print this usage\n"
@@ -54,12 +58,20 @@ bool parse_args(cliopt_map& opt_map, int argc, char **argv)
   using mapped_type = typename std::decay_t<decltype(opt_map)>::mapped_type;
   // loop through the arguments to collect options and their args if any
   for (int i = 1; i < argc; i++) {
+    // current argument, use string_view to prevent copying
+    std::string_view arg = argv[i];
     // help option
-    if (!std::strcmp(argv[i], "-h") || !std::strcmp(argv[i], "--help"))
+    if (arg == "-h" || arg == "--help")
       opt_map.insert_or_assign("help", mapped_type{});
     // version option
-    else if (!std::strcmp(argv[i], "-V") || !std::strcmp(argv[i], "--version"))
+    else if (arg == "-V" || arg == "--version")
       opt_map.insert_or_assign("version", mapped_type{});
+    // file to read from. if starting with "-", assume it is an option
+    else if (arg.size() && arg[0] != '-') {
+      // allow processing more than one file
+      opt_map.try_emplace("file", mapped_type{});
+      opt_map.at("file").emplace_back(arg);
+    }
     // unknown option
     else {
       std::cerr << "Error: Unknown option '" << argv[i] << "'. Try " <<
@@ -88,10 +100,31 @@ int main(int argc, char **argv)
     std::cout << program_version_info << std::endl;
     return EXIT_SUCCESS;
   }
+  // process input files
+  if (opt_map.find("file") != opt_map.end()) {
+    for (const auto& input_file : opt_map.at("file")) {
+      // get C file stream for input file + handle any errors
+      auto input_stream = std::fopen(input_file.c_str(), "r");
+      if (!input_stream) {
+        std::cerr << progname << ": error: " << input_file << ": " <<
+          std::strerror(errno) << std::endl;
+        return EXIT_FAILURE;
+      }
+      // reset yyin using file stream and parse
+      yyin = input_stream;
+      yy::parser parser;
+// support parser operation tracing
+#if YYDEBUG
+      parser.set_debug_level(1);
+#endif  // YYDEBUG
+      parser();
+    }
+    return EXIT_SUCCESS;
+  }
   // run simple lexing routine reporting on all the tokens
   // while (yylex().type_get())
   //   ;
-  // parser input and generate output. TODO: support explicit read from file
+  // otherwise, parse input from stdin
   yy::parser parser;
 // support parser operation tracing
 #if YYDEBUG

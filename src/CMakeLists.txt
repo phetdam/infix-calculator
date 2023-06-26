@@ -14,7 +14,7 @@ set(PDCALC_PARSER_SOURCE ${PDCALC_PARSER_PREFIX}.yy.cc)
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_PARSER_SOURCE}
     COMMAND
-        # TODO: temporarily use no-precedence until we have an actual parser
+        # TODO: use no-precedence until all operators are defined
         ${PDCALC_BISON} -Wall -Wno-precedence
             # use historical --defines for Bison 3.5.1. Bison requires that the
             # header is in the same directory as the generated source, so after
@@ -39,6 +39,7 @@ add_custom_command(
     # also no need for bison-bridge if we are using the C++ Bison parser.
     COMMAND
         ${PDCALC_FLEX} -CFe --noyywrap --nounistd --warn
+            --header-file=${PDCALC_INCLUDE_DIR}/pdcalc/${PDCALC_LEXER_HEADER}
             -o ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_SOURCE}
             ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_INPUT}
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_INPUT}
