@@ -19,3 +19,8 @@
 !(true || ((13 == 12) && !(4 + 3 * (3 - 9.3) == 0.5)));
 # no-op
 ;
+# 1 / 0;  # divide by zero triggers an error
+# <bool> true
+!(!!((3 << 2) < 1) && true);
+# <bool> false
+!(!(2 + 9 >= 11) || true);

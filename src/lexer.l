@@ -80,6 +80,10 @@ RPAREN         ")"
 "~"                     return yy::parser::make_TILDE();
 "<<"                    return yy::parser::make_LSHIFT();
 ">>"                    return yy::parser::make_RSHIFT();
+"<"                     return yy::parser::make_LANGLE();
+">"                     return yy::parser::make_RANGLE();
+"<="                    return yy::parser::make_LEQUALS();
+">="                    return yy::parser::make_GEQUALS();
 "true"                  return yy::parser::make_TRUTH(true);
 "false"                 return yy::parser::make_TRUTH(false);
 ";"                     return yy::parser::make_SEMICOLON();

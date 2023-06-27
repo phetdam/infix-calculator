@@ -11,18 +11,42 @@
     #include <iostream>
 
     #include "pdcalc/parser.h"
+
+    /**
+     * Assign result of division to a target while handling divide by zero.
+     *
+     * @note This should only be used from within the Bison-generated parser.
+     *
+     * @param target Target to assign result to
+     * @param left Left operand
+     * @param right Right operand
+     * @param
+     */
+    #define PDCALC_YY_SAFE_DIVIDE(target, left, right) \
+      do { \
+        if (right) \
+          target = (left) / (right); \
+        else { \
+          std::cerr << "Error: " << (left) << " / " << (right) << \
+            " is division by zero" << std::endl; \
+          YYABORT; \
+        } \
+      } \
+      while (0)
 %}
 
 /* C++ LR parser using variants handling complete symbols with error reporting.
  *
  * Requiring Bison 3.2 stops unnecessary stack.hh generation. For Bison 3.6+,
- * it is better for parse.error to have the value of detailed.
+ * it is better for parse.error to have the value of detailed. Lookahead
+ * correction enabled for more accurate error reporting of location.
  */
 %require "3.2"
 %language "c++"
 %define api.value.type variant
 %define api.token.constructor
 %define parse.error verbose
+%define parse.lac full
 
 /* Token definitions */
 %token <double> FLOATING
@@ -47,6 +71,8 @@
 %token NOT "!"
 %token LANGLE "<"
 %token RANGLE ">"
+%token LEQUALS "<="
+%token GEQUALS ">="
 %token NOT_EQUALS "!="
 %token SEMICOLON ";"
 
@@ -57,6 +83,7 @@
 %left "^"
 %left "&"
 %left "==" "!="
+%left "<" "<=" ">" ">="
 %left "<<" ">>"
 %left "+" "-"
 %left "*" "/" "%"
@@ -96,7 +123,7 @@ i_expr:
 | i_expr[left] "+" i_expr[right]    { $$ = $left + $right; }
 | i_expr[left] "-" i_expr[right]    { $$ = $left - $right; }
 | i_expr[left] "*" i_expr[right]    { $$ = $left * $right; }
-| i_expr[left] "/" i_expr[right]    { $$ = $left / $right; }
+| i_expr[left] "/" i_expr[right]    { PDCALC_YY_SAFE_DIVIDE($$, $left, $right); }
 | i_expr[left] "%" i_expr[right]    { $$ = $left % $right; }
 | i_expr[left] "&" i_expr[right]    { $$ = $left & $right; }
 | i_expr[left] "^" i_expr[right]    { $$ = $left ^ $right; }
@@ -112,17 +139,17 @@ d_expr:
 | d_expr[left] "+" d_expr[right]    { $$ = $left + $right; }
 | d_expr[left] "-" d_expr[right]    { $$ = $left - $right; }
 | d_expr[left] "*" d_expr[right]    { $$ = $left * $right; }
-| d_expr[left] "/" d_expr[right]    { $$ = $left / $right; }
+| d_expr[left] "/" d_expr[right]    { PDCALC_YY_SAFE_DIVIDE($$, $left, $right); }
 /* promoting right i_expr */
 | d_expr[left] "+" i_expr[right]    { $$ = $left + $right; }
 | d_expr[left] "-" i_expr[right]    { $$ = $left - $right; }
 | d_expr[left] "*" i_expr[right]    { $$ = $left * $right; }
-| d_expr[left] "/" i_expr[right]    { $$ = $left / $right; }
+| d_expr[left] "/" i_expr[right]    { PDCALC_YY_SAFE_DIVIDE($$, $left, $right); }
 /* promoting left i_expr */
 | i_expr[left] "+" d_expr[right]    { $$ = $left + $right; }
 | i_expr[left] "-" d_expr[right]    { $$ = $left - $right; }
 | i_expr[left] "*" d_expr[right]    { $$ = $left * $right; }
-| i_expr[left] "/" d_expr[right]    { $$ = $left / $right; }
+| i_expr[left] "/" d_expr[right]    { PDCALC_YY_SAFE_DIVIDE($$, $left, $right); }
 
 /* Boolean expression rule */
 b_expr:
@@ -139,12 +166,24 @@ b_expr:
 | d_expr[left] "!=" d_expr[right]     { $$ = ($left != $right); }
 | i_expr[left] "==" i_expr[right]     { $$ = ($left == $right); }
 | i_expr[left] "!=" i_expr[right]     { $$ = ($left != $right); }
+| i_expr[left] "<" i_expr[right]      { $$ = ($left < $right); }
+| i_expr[left] ">" i_expr[right]      { $$ = ($left > $right); }
+| i_expr[left] "<=" i_expr[right]     { $$ = ($left <= $right); }
+| i_expr[left] ">=" i_expr[right]     { $$ = ($left >= $right); }
 /* d_expr left, i_expr right */
 | d_expr[left] "==" i_expr[right]     { $$ = ($left == $right); }
 | d_expr[left] "!=" i_expr[right]     { $$ = ($left != $right); }
+| d_expr[left] "<" i_expr[right]      { $$ = ($left < $right); }
+| d_expr[left] ">" i_expr[right]      { $$ = ($left > $right); }
+| d_expr[left] "<=" i_expr[right]     { $$ = ($left <= $right); }
+| d_expr[left] ">=" i_expr[right]     { $$ = ($left >= $right); }
 /* i_expr left, d_expr right */
 | i_expr[left] "==" d_expr[right]     { $$ = ($left == $right); }
 | i_expr[left] "!=" d_expr[right]     { $$ = ($left != $right); }
+| i_expr[left] "<" d_expr[right]      { $$ = ($left < $right); }
+| i_expr[left] ">" d_expr[right]      { $$ = ($left > $right); }
+| i_expr[left] "<=" d_expr[right]     { $$ = ($left <= $right); }
+| i_expr[left] ">=" d_expr[right]     { $$ = ($left >= $right); }
 
 %%
 
