@@ -106,6 +106,12 @@ int parse_files(const std::vector<std::string>& input_files)
     parser.set_debug_level(1);
 #endif  // YYDEBUG
     parser();
+    // close file + handle any errors
+    if (std::fclose(input_stream)) {
+      std::cerr << progname << ": error: " << input_file << ": " <<
+        std::strerror(errno) << std::endl;
+      return EXIT_FAILURE;
+    }
   }
   return EXIT_SUCCESS;
 }
