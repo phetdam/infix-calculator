@@ -166,6 +166,10 @@ b_expr:
 | d_expr[left] "!=" d_expr[right]     { $$ = ($left != $right); }
 | i_expr[left] "==" i_expr[right]     { $$ = ($left == $right); }
 | i_expr[left] "!=" i_expr[right]     { $$ = ($left != $right); }
+| d_expr[left] "<" d_expr[right]      { $$ = ($left < $right); }
+| d_expr[left] ">" d_expr[right]      { $$ = ($left > $right); }
+| d_expr[left] "<=" d_expr[right]     { $$ = ($left <= $right); }
+| d_expr[left] ">=" d_expr[right]     { $$ = ($left >= $right); }
 | i_expr[left] "<" i_expr[right]      { $$ = ($left < $right); }
 | i_expr[left] ">" i_expr[right]      { $$ = ($left > $right); }
 | i_expr[left] "<=" i_expr[right]     { $$ = ($left <= $right); }
