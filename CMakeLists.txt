@@ -41,6 +41,21 @@ endif()
 # we use lowercase build type in the project
 string(TOLOWER ${CMAKE_BUILD_TYPE} PDCALC_BUILD_TYPE)
 
+# eliminate per-configuration subdirs from being appended to build artifact
+# output dirs for multi-config generators, e.g. Visual Studio
+set(
+    CMAKE_RUNTIME_OUTPUT_DIRECTORY
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$<$<CONFIG:Debug>:>
+)
+set(
+    CMAKE_LIBRARY_OUTPUT_DIRECTORY
+    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}$<$<CONFIG:Debug>:>
+)
+set(
+    CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+    ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}$<$<CONFIG:Debug>:>
+)
+
 # set some system information variables used for the version info
 set(PDCALC_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
 set(PDCALC_SYSTEM_VERSION ${CMAKE_SYSTEM_VERSION})
