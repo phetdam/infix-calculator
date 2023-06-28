@@ -38,8 +38,8 @@ project(
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
-# we use lowercase build type in the project
-string(TOLOWER ${CMAKE_BUILD_TYPE} PDCALC_BUILD_TYPE)
+# used to use lowercase, now we just assign to PDCALC_BUILD_TYPE
+set(PDCALC_BUILD_TYPE ${CMAKE_BUILD_TYPE})
 
 # eliminate per-configuration subdirs from being appended to build artifact
 # output dirs for multi-config generators, e.g. Visual Studio
