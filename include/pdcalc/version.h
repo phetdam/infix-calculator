@@ -45,9 +45,9 @@ inline const char* c_version = version.c_str();
 // version as a macro, using the C string
 #define PDCALC_VERSION pdcalc::c_version
 
-// build type, real build defines as lowercase CMake CMAKE_BUILD_TYPE
+// build type, real build defines as CMake CMAKE_BUILD_TYPE
 #ifndef PDCALC_BUILD_TYPE
-#define PDCALC_BUILD_TYPE "debug"
+#define PDCALC_BUILD_TYPE "Debug"
 #endif  // PDCALC_BUILD_TYPE
 
 namespace pdcalc {
