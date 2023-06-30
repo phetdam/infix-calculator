@@ -29,8 +29,8 @@ systems, with an alternative being setting either environment or CMake
 variables with the directory location of Flex and Bison. For the latter,
 ``PDCALC_FLEX_BISON_DIR`` can simply be set if both Flex and Bison are in the
 same directory, e.g. when pointing to the location of a WinFlexBison_ release
-on Windows, or if they happen to be located in different directories,
-``PDCALC_FLEX_DIR`` and ``PDCALC_BISON_DIR`` can be set appropriately.
+on Windows. If located in different directories, ``PDCALC_FLEX_DIR`` and
+``PDCALC_BISON_DIR`` can be set appropriately.
 
 .. _CMake: https://cmake.org/cmake/help/latest/
 
