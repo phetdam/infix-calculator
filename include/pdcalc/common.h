@@ -17,4 +17,8 @@
 #define PDCALC_EXTERN_C_END
 #endif  // __cplusplus
 
+// stringification macros
+#define PDCALC_STRINGIFY_I(x) #x
+#define PDCALC_STRINGIFY(x) PDCALC_STRINGIFY_I(x)
+
 #endif  // PDCALC_COMMON_H_

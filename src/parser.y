@@ -7,8 +7,17 @@
  */
 
 %{
+    // user-defined headers typically should not go first, but this only
+    // contains macros used for controlling the warning state
+    #include "pdcalc/warnings.h"
+
+    // MSVC reports __STDC_WANT_SECURE_LIB__ not defined in limits.h, which it
+    // replaces with an #if 0 for the conditional, so we manually suppress this
+    PDCALC_MSVC_WARNING_PUSH()
+    PDCALC_MSVC_WARNING_DISABLE(4668)
     #include <ios>
     #include <iostream>
+    PDCALC_MSVC_WARNING_POP()
 
     #include "pdcalc/parser.h"
 
