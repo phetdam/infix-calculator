@@ -85,6 +85,8 @@ bool parse_args(cliopt_map& opt_map, int argc, char **argv)
 /**
  * Parse the given input file paths.
  *
+ * @todo Replace with use of the `pdcalc` parser driver.
+ *
  * @param input_files Input file paths
  * @returns `EXIT_SUCCESS` if successful, `EXIT_FAILURE` on error
  */
@@ -100,10 +102,11 @@ int parse_files(const std::vector<std::string>& input_files)
     }
     // reset yyin using file stream and parse
     yyin = input_stream;
-    yy::parser parser;
+    pdcalc::parser pp;
+    yy::parser parser{pp};
 // support parser operation tracing
 #if YYDEBUG
-    parser.set_debug_level(1);
+    parser.set_debug_level(0);
 #endif  // YYDEBUG
     parser();
     // close file + handle any errors
@@ -137,15 +140,8 @@ int main(int argc, char **argv)
   // process input files
   if (opt_map.find("file") != opt_map.end())
     return parse_files(opt_map.at("file"));
-  // run simple lexing routine reporting on all the tokens
-  // while (yylex().type_get())
-  //   ;
   // otherwise, parse input from stdin
-  yy::parser parser;
-// support parser operation tracing
-#if YYDEBUG
-  parser.set_debug_level(1);
-#endif  // YYDEBUG
-  parser();
+  pdcalc::parser parser;
+  parser.parse();
   return EXIT_SUCCESS;
 }

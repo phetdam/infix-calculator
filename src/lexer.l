@@ -13,27 +13,34 @@
 %option noinput nounput never-interactive
 
 %{
-    #include <stdio.h>
+  #include <cstdio>
 
-    // MSVC complains that stdint.h is redefining fixed-width integral type
-    // macros like INT8_MIN, UINT32_MAX, etc. so disable this warning
-    #ifdef _MSC_VER
-    #pragma warning (push)
-    #pragma warning (disable: 4005)
-    #endif  // _MSC_VER
+  // MSVC complains that stdint.h is redefining fixed-width integral type
+  // macros like INT8_MIN, UINT32_MAX, etc. so disable this warning
+  #ifdef _MSC_VER
+  #pragma warning (push)
+  #pragma warning (disable: 4005)
+  #endif  // _MSC_VER
 
-    #include <string>
+  #include <string>
 
-    #ifdef _MSC_VER
-    #pragma warning (pop)
-    #endif  // _MSC_VER
+  #ifdef _MSC_VER
+  #pragma warning (pop)
+  #endif  // _MSC_VER
 
-    #include "pdcalc/parser.h"
+  // TODO: change to pdcalc/parse_driver.h
+  #include "pdcalc/parser.h"
 
-    /**
-     * Standard action for a token that echoes it to stdout.
-     */
-    #define PDCALC_ECHO_TOKEN() printf("A %s\n", yytext)
+  /**
+   * User-defined action run after token match before its rule action.
+   *
+   * Here we just advance the location reference's end position columns by the
+   * length of the token that was just matched to track locations.
+   *
+   * Note that `YY_USER_ACTION` must be a full statement ending with a
+   * semicolon or braced context as otherwise you will get a compile error.
+   */
+  #define YY_USER_ACTION loc.columns(yyleng);
 %}
 
 /* Start conditions */
@@ -58,50 +65,107 @@ FLOAT          {INT}"."{MAYBE_DIGITS}
 IDEN           ({CHAR}|_)+({ALNUM}|_)*
 /* If we implement commands in the REPL */
 COMMAND        @{IDEN}
-WHITESPACE     [ \t\r\n]+
+/* We treat blanks and newlines separately for accurate location tracking, as
+ * only newlines result in column being reset and moving to next line. Location
+ * is stepped for both blanks and newlines, but newlines increase the number of
+ * lines by the number of newlines that are read.
+ */
+BLANKS         [ \t\r]+
+NEWLINES       \n+
 LPAREN         "("
 RPAREN         ")"
 
 
 /* Rules */
-
 %%
 
-{INT}                   return yy::parser::make_INTEGRAL(std::stol(yytext));
-{FLOAT}                 return yy::parser::make_FLOATING(std::stod(yytext));
-"+"                     return yy::parser::make_PLUS();
-"-"                     return yy::parser::make_MINUS();
-"*"                     return yy::parser::make_STAR();
-"/"                     return yy::parser::make_SLASH();
-"%"                     return yy::parser::make_PERCENT();
-"|"                     return yy::parser::make_PIPE();
-"&"                     return yy::parser::make_AMPERSAND();
-"^"                     return yy::parser::make_CARET();
-"~"                     return yy::parser::make_TILDE();
-"<<"                    return yy::parser::make_LSHIFT();
-">>"                    return yy::parser::make_RSHIFT();
-"<"                     return yy::parser::make_LANGLE();
-">"                     return yy::parser::make_RANGLE();
-"<="                    return yy::parser::make_LEQUALS();
-">="                    return yy::parser::make_GEQUALS();
-"true"                  return yy::parser::make_TRUTH(true);
-"false"                 return yy::parser::make_TRUTH(false);
-";"                     return yy::parser::make_SEMICOLON();
-"&&"                    return yy::parser::make_AND();
-"||"                    return yy::parser::make_OR();
-"!"                     return yy::parser::make_NOT();
+%{
+  // location setup code run before scanning. YY_DECL is a friend of the
+  // pdcalc::parser class and so can update the location_ member directly
+  auto& loc = parse_context.location_;
+  // move start position onto previous end position
+  loc.step();
+%}
+
+{INT}                   return yy::parser::make_INTEGRAL(std::stol(yytext), loc);
+{FLOAT}                 return yy::parser::make_FLOATING(std::stod(yytext), loc);
+"+"                     return yy::parser::make_PLUS(loc);
+"-"                     return yy::parser::make_MINUS(loc);
+"*"                     return yy::parser::make_STAR(loc);
+"/"                     return yy::parser::make_SLASH(loc);
+"%"                     return yy::parser::make_PERCENT(loc);
+"|"                     return yy::parser::make_PIPE(loc);
+"&"                     return yy::parser::make_AMPERSAND(loc);
+"^"                     return yy::parser::make_CARET(loc);
+"~"                     return yy::parser::make_TILDE(loc);
+"<<"                    return yy::parser::make_LSHIFT(loc);
+">>"                    return yy::parser::make_RSHIFT(loc);
+"<"                     return yy::parser::make_LANGLE(loc);
+">"                     return yy::parser::make_RANGLE(loc);
+"<="                    return yy::parser::make_LEQUALS(loc);
+">="                    return yy::parser::make_GEQUALS(loc);
+"true"                  return yy::parser::make_TRUTH(true, loc);
+"false"                 return yy::parser::make_TRUTH(false, loc);
+";"                     return yy::parser::make_SEMICOLON(loc);
+"&&"                    return yy::parser::make_AND(loc);
+"||"                    return yy::parser::make_OR(loc);
+"!"                     return yy::parser::make_NOT(loc);
 "#"                     BEGIN(LINE_COMMENT);
 <LINE_COMMENT>[^\n]*
-<LINE_COMMENT>\n        BEGIN(INITIAL);
+<LINE_COMMENT>\n        loc.lines(yyleng); loc.step(); BEGIN(INITIAL);
   /* {COMMAND}               printf("A command name: %s\n", yytext); */
-{WHITESPACE}
+{BLANKS}                loc.step();
+{NEWLINES}              loc.lines(yyleng); loc.step();
   /*{IDEN}                  printf("An identifier: %s\n", yytext); */
-"("                     return yy::parser::make_LPAREN();
-")"                     return yy::parser::make_RPAREN();
-"=="                    return yy::parser::make_EQUALS();
-"!="                    return yy::parser::make_NOT_EQUALS();
+"("                     return yy::parser::make_LPAREN(loc);
+")"                     return yy::parser::make_RPAREN(loc);
+"=="                    return yy::parser::make_EQUALS(loc);
+"!="                    return yy::parser::make_NOT_EQUALS(loc);
 .                       {
                           throw yy::parser::syntax_error{
+                            loc,
                             "Unrecognized token '" + std::string{yytext} + '"'
                           };
                         }
+  /* With Bison locations turned on an EOF rule is required */
+<<EOF>>                 return yy::parser::make_YYEOF(loc);
+
+%%
+
+namespace pdcalc {
+
+/**
+ * Perform setup for the Flex lexer.
+ *
+ * @param input_file Input file to read. If empty or "-", `stdin` is used.
+ * @param enable_debug `true` to turn on lexer tracing, default `false`
+ * @returns `true` on success, `false` on failure
+ */
+bool parser::lex_setup(const std::string& input_file, bool enable_debug)
+{
+  // enable/disable debugging. note yy_flex_debug declaration is not exported
+  // in the Flex-generated lexer.yy.h header, so we have to implement this
+  // function directly as part of the generated lexer.yy.cc file.
+  yy_flex_debug = enable_debug;
+  // empty file or "-" to read from stdin. latter follows POSIX conventions
+  if (input_file.empty() || input_file == "-")
+    yyin = stdin;
+  // otherwise, attempt to read from file
+  else if (!(yyin = std::fopen(input_file.c_str(), "r")))
+    return false;
+  return true;
+}
+
+/**
+ * Perform cleanup for the Flex lexer.
+ *
+ * Currently, all this does is close `yyin` unless `yyin` is `stdin`.
+ */
+bool parser::lex_cleanup()
+{
+  if (yyin == stdin)
+    return true;
+  return !std::fclose(yyin);
+}
+
+}  // namespace pdcalc

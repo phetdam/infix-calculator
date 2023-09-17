@@ -7,45 +7,49 @@
  */
 
 %{
-    // user-defined headers typically should not go first, but this only
-    // contains macros used for controlling the warning state
-    #include "pdcalc/warnings.h"
+  // user-defined headers typically should not go first, but this only
+  // contains macros used for controlling the warning state
+  #include "pdcalc/warnings.h"
 
-    // MSVC reports __STDC_WANT_SECURE_LIB__ not defined in limits.h, which it
-    // replaces with an #if 0 for the conditional, so we manually suppress this
-    PDCALC_MSVC_WARNING_PUSH()
-    PDCALC_MSVC_WARNING_DISABLE(4668)
-    #include <ios>
-    #include <iostream>
-    PDCALC_MSVC_WARNING_POP()
+  // MSVC reports __STDC_WANT_SECURE_LIB__ not defined in limits.h, which it
+  // replaces with an #if 0 for the conditional, so we manually suppress this
+  PDCALC_MSVC_WARNING_PUSH()
+  PDCALC_MSVC_WARNING_DISABLE(4668)
+  #include <ios>
+  #include <iostream>
+  PDCALC_MSVC_WARNING_POP()
 
-    #include "pdcalc/parser.h"
+  // TODO: change to pdcalc/parse_driver.h
+  #include "pdcalc/parser.h"
 
-    /**
-     * Assign result of division to a target while handling divide by zero.
-     *
-     * @note This should only be used from within the Bison-generated parser.
-     *
-     * @param target Target to assign result to
-     * @param left Left operand
-     * @param right Right operand
-     * @param
-     */
-    #define PDCALC_YY_SAFE_DIVIDE(target, left, right) \
-      do { \
-        if (right) \
-          target = (left) / (right); \
-        else { \
-          std::cerr << "Error: " << (left) << " / " << (right) << \
-            " is division by zero" << std::endl; \
-          YYABORT; \
-        } \
+  /**
+   * Assign result of division to a target while handling divide by zero.
+   *
+   * @note This should only be used from within the Bison-generated parser.
+   *
+   * @param target Target to assign result to
+   * @param left Left operand
+   * @param right Right operand
+   * @param
+   */
+  #define PDCALC_YY_SAFE_DIVIDE(target, left, right) \
+    do { \
+      if (right) \
+        target = (left) / (right); \
+      else { \
+        std::cerr << "Error: " << (left) << " / " << (right) << \
+          " is division by zero" << std::endl; \
+        YYABORT; \
       } \
-      while (0)
+    } \
+    while (0)
 %}
 
 /* C++ LR parser using variants handling complete symbols with error reporting.
  *
+ * Location tracking is enabled and as recommended by the Bison documentation,
+ * the parser's parse() function takes an extra parameter for pdcalc parser.
+*
  * Requiring Bison 3.2 stops unnecessary stack.hh generation. For Bison 3.6+,
  * it is better for parse.error to have the value of detailed. Lookahead
  * correction enabled for more accurate error reporting of location.
@@ -56,6 +60,10 @@
 %define api.token.constructor
 %define parse.error verbose
 %define parse.lac full
+%define parse.trace
+%locations
+/* TODO: change to { pdcalc::parse_driver parse_driver } */
+%param { pdcalc::parser& parse_context }
 
 /* Token definitions */
 %token <double> FLOATING
@@ -205,13 +213,14 @@ namespace yy {
 /**
  * User-defined error handler.
  *
- * Currently, all it does is print the exception message.
+ * Currently, all it does is print the location and exception message.
  *
- * @param message Bison exception error message
+ * @param loc Bison error location
+ * @param msg Bison exception error message
  */
-void parser::error(const std::string& message)
+void parser::error(const parser::location_type& loc, const std::string& msg)
 {
-  std::cerr << "Error: " << message << std::endl;
+  std::cerr << "Error: " << loc << ": " << msg << std::endl;
 }
 
 }  // namespace yy
