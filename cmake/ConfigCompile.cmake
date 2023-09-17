@@ -22,7 +22,6 @@ if(MSVC)
         /wd4820
         # insertion of Spectre mitigation if using /QSpectre
         /wd5045
-        $<$<CONFIG:Debug>:/DEBUG>
     )
 # GCC/Clang for *nix systems
 else()
