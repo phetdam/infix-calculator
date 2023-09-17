@@ -114,13 +114,30 @@ public:
     return !status;
   }
 
+  /**
+   * Parse input from `stdin` without tracing.
+   */
   auto operator()() { return parse(); }
 
+  /**
+   * Parse the specified input file.
+   *
+   * @param input_file File to read input from, empty or "-" for `stdin`
+   * @param enable_trace `true` to enable lexer and parse tracing
+   */
   auto operator()(const std::string& input_file, bool enable_trace = false)
   {
     return parse(input_file, enable_trace);
   }
 
+  /**
+   * Parse the specified input file.
+   *
+   * @param input_file File to read input from, empty or "-" for `stdin`
+   * @param trace_lexer `true` to enable lexer tracing
+   * @param trace_parser `true` to enable parser tracing
+   * @returns `true` on success, `false` on failure
+   */
   auto operator()(
     const std::string& input_file, bool trace_lexer, bool trace_parser)
   {
