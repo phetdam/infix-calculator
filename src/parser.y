@@ -124,10 +124,10 @@ input:
 /* Statement rule */
 stmt:
   ";"           /* empty statement */
-| i_expr ";"    { std::cout << "<long>   " << $1 << std::endl; }
+| i_expr ";"    { std::cout << "<long> " << $1 << std::endl; }
 | d_expr ";"    { std::cout << "<double> " << $1 << std::endl; }
 | b_expr ";"    {
-                  std::cout << "<bool>   " << std::boolalpha << $1 <<
+                  std::cout << "<bool> " << std::boolalpha << $1 <<
                     std::noboolalpha << std::endl;
                 }
 
