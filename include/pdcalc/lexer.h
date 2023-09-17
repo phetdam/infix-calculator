@@ -8,10 +8,10 @@
 #ifndef PDCALC_LEXER_H_
 #define PDCALC_LEXER_H_
 
-#include "pdcalc/common.h"
 #include "pdcalc/parser.h"
 
-// generated Flex C API header does not have extern "C" guards. note that this
+// generated Flex C API header does not have extern "C" guards, but we don't
+// need to add them since we are compiling the lexer as C++. note that this
 // must be included AFTER parser.h to pick up the custom YY_DECL declaration.
 #include "pdcalc/lexer.yy.h"
 

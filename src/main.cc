@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -16,7 +17,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "pdcalc/lexer.h"
 #include "pdcalc/parser.h"
 #include "pdcalc/version.h"
 
@@ -92,27 +92,27 @@ bool parse_args(cliopt_map& opt_map, int argc, char **argv)
  */
 int parse_files(const std::vector<std::string>& input_files)
 {
+  // check that input files exist and are regular
   for (const auto& input_file : input_files) {
-    // get C file stream for input file + handle any errors
-    auto input_stream = std::fopen(input_file.c_str(), "r");
-    if (!input_stream) {
-      std::cerr << progname << ": error: " << input_file << ": " <<
-        std::strerror(errno) << std::endl;
+    // file existence
+    if (!std::filesystem::exists(input_file)) {
+      std::cerr << progname << ": error: " << input_file <<
+        " does not exist" << std::endl;
       return EXIT_FAILURE;
     }
-    // reset yyin using file stream and parse
-    yyin = input_stream;
-    pdcalc::parser pp;
-    yy::parser parser{pp};
-// support parser operation tracing
-#if YYDEBUG
-    parser.set_debug_level(0);
-#endif  // YYDEBUG
-    parser();
-    // close file + handle any errors
-    if (std::fclose(input_stream)) {
-      std::cerr << progname << ": error: " << input_file << ": " <<
-        std::strerror(errno) << std::endl;
+    // not a directory, device, etc.
+    if (!std::filesystem::is_regular_file(input_file)) {
+      std::cerr << progname << ": error: " << input_file <<
+        " is not a regular file" << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  // parse in a batch
+  pdcalc::parse_driver parser;
+  for (const auto& input_file : input_files) {
+    if (!parser(input_file)) {
+      std::cerr << progname << ": error: " << input_file <<
+        " parsing failed" << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -141,7 +141,6 @@ int main(int argc, char **argv)
   if (opt_map.find("file") != opt_map.end())
     return parse_files(opt_map.at("file"));
   // otherwise, parse input from stdin
-  pdcalc::parser parser;
-  parser.parse();
-  return EXIT_SUCCESS;
+  pdcalc::parse_driver parser;
+  return !parser();
 }

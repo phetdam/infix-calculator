@@ -13,22 +13,23 @@
 %option noinput nounput never-interactive
 
 %{
+  // only contains warning macro helpers, so ok to put first
+  #include "pdcalc/warnings.h"
+
+  #include <cerrno>
   #include <cstdio>
+  #include <cstring>
 
   // MSVC complains that stdint.h is redefining fixed-width integral type
-  // macros like INT8_MIN, UINT32_MAX, etc. so disable this warning
-  #ifdef _MSC_VER
-  #pragma warning (push)
-  #pragma warning (disable: 4005)
-  #endif  // _MSC_VER
+  // macros like INT8_MIN, UINT32_MAX, etc. so disable this warning. this can
+  // also be avoided by putting #include <cstdio> in a top% block
+  PDCALC_MSVC_WARNING_PUSH()
+  PDCALC_MSVC_WARNING_DISABLE(4005)
+  #include <stdexcept>
+  PDCALC_MSVC_WARNING_POP()
 
   #include <string>
 
-  #ifdef _MSC_VER
-  #pragma warning (pop)
-  #endif  // _MSC_VER
-
-  // TODO: change to pdcalc/parse_driver.h
   #include "pdcalc/parser.h"
 
   /**
@@ -80,9 +81,9 @@ RPAREN         ")"
 %%
 
 %{
-  // location setup code run before scanning. YY_DECL is a friend of the
-  // pdcalc::parser class and so can update the location_ member directly
-  auto& loc = parse_context.location_;
+  // location setup code run before scanning. PDCALC_YYLEX is a friend of the
+  // pdcalc::parse_driver class and so can update the location_ member directly
+  auto& loc = parse_driver.location_;
   // move start position onto previous end position
   loc.step();
 %}
@@ -141,31 +142,36 @@ namespace pdcalc {
  * @param enable_debug `true` to turn on lexer tracing, default `false`
  * @returns `true` on success, `false` on failure
  */
-bool parser::lex_setup(const std::string& input_file, bool enable_debug)
+void parse_driver::lex_setup(const std::string& input_file, bool enable_debug)
 {
   // enable/disable debugging. note yy_flex_debug declaration is not exported
   // in the Flex-generated lexer.yy.h header, so we have to implement this
   // function directly as part of the generated lexer.yy.cc file.
+  // TODO: use yyset_debug instead, which is exported in lexer.yy.h
   yy_flex_debug = enable_debug;
   // empty file or "-" to read from stdin. latter follows POSIX conventions
   if (input_file.empty() || input_file == "-")
     yyin = stdin;
-  // otherwise, attempt to read from file
-  else if (!(yyin = std::fopen(input_file.c_str(), "r")))
-    return false;
-  return true;
+  // otherwise, attempt to read from file. throw on error
+  else if ((yyin = std::fopen(input_file.c_str(), "r")) == nullptr)
+    throw std::runtime_error{
+      "Error opening " + input_file + ": " + std::string{std::strerror(errno)}
+    };
 }
 
 /**
  * Perform cleanup for the Flex lexer.
  *
  * Currently, all this does is close `yyin` unless `yyin` is `stdin`.
+ *
+ * @param input_file Input file passed to `lex_setup`. Used in error reporting.
  */
-bool parser::lex_cleanup()
+void parse_driver::lex_cleanup(const std::string& input_file)
 {
-  if (yyin == stdin)
-    return true;
-  return !std::fclose(yyin);
+  if (yyin != stdin && std::fclose(yyin))
+    throw std::runtime_error{
+      "Error closing " + input_file + ": " + std::string{std::strerror(errno)}
+    };
 }
 
 }  // namespace pdcalc

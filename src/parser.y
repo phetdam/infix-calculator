@@ -19,7 +19,6 @@
   #include <iostream>
   PDCALC_MSVC_WARNING_POP()
 
-  // TODO: change to pdcalc/parse_driver.h
   #include "pdcalc/parser.h"
 
   /**
@@ -48,7 +47,7 @@
 /* C++ LR parser using variants handling complete symbols with error reporting.
  *
  * Location tracking is enabled and as recommended by the Bison documentation,
- * the parser's parse() function takes an extra parameter for pdcalc parser.
+ * the parser's parse() function takes the pdcalc parse driver as a parameter.
 *
  * Requiring Bison 3.2 stops unnecessary stack.hh generation. For Bison 3.6+,
  * it is better for parse.error to have the value of detailed. Lookahead
@@ -62,8 +61,7 @@
 %define parse.lac full
 %define parse.trace
 %locations
-/* TODO: change to { pdcalc::parse_driver parse_driver } */
-%param { pdcalc::parser& parse_context }
+%param { pdcalc::parse_driver& parse_driver }
 
 /* Token definitions */
 %token <double> FLOATING
