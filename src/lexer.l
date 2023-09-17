@@ -9,8 +9,9 @@
 /* Lexer is never going to be used interactively but is non-reetrant. We don't
  * generate the input() and yyunput() functions since it will not be
  * interactive and must make lexer non-reentrant to work with C++ Bison parser.
+ * The debug option is provided to allow tracing of the lexer.
  */
-%option noinput nounput never-interactive
+%option noinput nounput never-interactive debug
 
 %{
   // only contains warning macro helpers, so ok to put first
@@ -111,8 +112,11 @@ RPAREN         ")"
 "&&"                    return yy::parser::make_AND(loc);
 "||"                    return yy::parser::make_OR(loc);
 "!"                     return yy::parser::make_NOT(loc);
+  /* Start parsing line comment when '#' is seen */
 "#"                     BEGIN(LINE_COMMENT);
+  /* Ignore comment contents until newline */
 <LINE_COMMENT>[^\n]*
+  /* For each commented line, update position, and return the normal lexing */
 <LINE_COMMENT>\n        loc.lines(yyleng); loc.step(); BEGIN(INITIAL);
   /* {COMMAND}               printf("A command name: %s\n", yytext); */
 {BLANKS}                loc.step();
@@ -122,12 +126,10 @@ RPAREN         ")"
 ")"                     return yy::parser::make_RPAREN(loc);
 "=="                    return yy::parser::make_EQUALS(loc);
 "!="                    return yy::parser::make_NOT_EQUALS(loc);
-.                       {
-                          throw yy::parser::syntax_error{
-                            loc,
-                            "Unrecognized token '" + std::string{yytext} + '"'
-                          };
-                        }
+.                       throw yy::parser::syntax_error{
+                          loc,
+                          "Unrecognized token '" + std::string{yytext} + "'"
+                        };
   /* With Bison locations turned on an EOF rule is required */
 <<EOF>>                 return yy::parser::make_YYEOF(loc);
 
