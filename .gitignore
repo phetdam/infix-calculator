@@ -1,8 +1,9 @@
 # ignore build directories
-/build
-/build_windows
+/build*
 # ignore CTest /Testing directory
 /Testing
+# ignroe VS Code settings directory
+/.vscode
 # ignore build artifacts
 *.a
 *.dll
@@ -15,3 +16,4 @@
 *.yy.c
 *.yy.cc
 *.yy.h
+location.hh
