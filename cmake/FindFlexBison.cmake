@@ -34,7 +34,7 @@ if(NOT DEFINED PDCALC_FLEX_DIR)
         message(
             STATUS
             "PDCALC_FLEX_DIR not defined, using PDCALC_FLEX_BISON_DIR "
-"(${PDCALC_FLEX_BISON_DIR})"
+"${PDCALC_FLEX_BISON_DIR}"
         )
         set(PDCALC_FLEX_DIR ${PDCALC_FLEX_BISON_DIR})
     else()
@@ -54,7 +54,7 @@ if(NOT DEFINED PDCALC_BISON_DIR)
         message(
             STATUS
             "PDCALC_BISON_DIR not defined, using PDCALC_FLEX_BISON_DIR "
-"(${PDCALC_FLEX_BISON_DIR})"
+"${PDCALC_FLEX_BISON_DIR}"
         )
         set(PDCALC_BISON_DIR ${PDCALC_FLEX_BISON_DIR})
     else()
