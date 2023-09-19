@@ -47,4 +47,12 @@ add_custom_command(
     COMMENT "Running Flex to build lexer ${PDCALC_LEXER_SOURCE}"
     VERBATIM
 )
+# MSVC complains that a conditional expression in the Bison-generated parser
+# source is constant, so we silence it just for this source file
+if(MSVC)
+    set_source_files_properties(
+        ${PDCALC_PARSER_SOURCE} PROPERTIES
+        COMPILE_OPTIONS /wd4127
+    )
+endif()
 add_executable(pdcalc main.cc ${PDCALC_LEXER_SOURCE} ${PDCALC_PARSER_SOURCE})
