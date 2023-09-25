@@ -27,4 +27,10 @@ if(MSVC)
 else()
     # CMake adds -g by default for debug builds
     add_compile_options(-Wall $<$<NOT:$<CONFIG:Debug>>:-O3>)
+    # enable AddressSanitizer
+    if(ENABLE_ASAN)
+        message(STATUS "Enabling AddressSanitizer (-fsanitize=address)")
+        add_compile_options(-fsanitize=address)
+        add_link_options(-fsanitize=address)
+    endif()
 endif()
