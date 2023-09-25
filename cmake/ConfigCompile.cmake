@@ -23,6 +23,12 @@ if(MSVC)
         # insertion of Spectre mitigation if using /QSpectre
         /wd5045
     )
+    # enable AddressSanitizer. note that AddressSanitizer does not seem to
+    # integrate well with Google Test, so unit test runners may have issues
+    if(ENABLE_ASAN)
+        message(STATUS "Enabling AddressSanitizer (/fsanitize=address)")
+        add_compile_options(/fsanitize=address)
+    endif()
 # GCC/Clang for *nix systems
 else()
     # CMake adds -g by default for debug builds
