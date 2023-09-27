@@ -48,6 +48,15 @@
       } \
     } \
     while (0)
+
+  /**
+   * Print an expression truth value to stdout as "true" or "false".
+   *
+   * @param value Boolean value of an expression
+   */
+  #define PDCALC_YY_PRINT_BOOL(value) \
+    std::cout << "<bool> " << std::boolalpha << (value) << std::noboolalpha << \
+      std::endl;
 %}
 
 /* C++ LR parser using variants handling complete symbols with error reporting.
@@ -134,10 +143,7 @@ stmt:
   ";"           /* empty statement */
 | i_expr ";"    { std::cout << "<long> " << $1 << std::endl; }
 | d_expr ";"    { std::cout << "<double> " << $1 << std::endl; }
-| b_expr ";"    {
-                  std::cout << "<bool> " << std::boolalpha << $1 <<
-                    std::noboolalpha << std::endl;
-                }
+| b_expr ";"    { PDCALC_YY_PRINT_BOOL($1); }
 
 /* Integral expression rule */
 i_expr:
