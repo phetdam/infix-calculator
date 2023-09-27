@@ -115,8 +115,7 @@ public:
     // perform Flex lexer cleanup + return
     if (!lex_cleanup(input_file))
       return false;
-    // TODO: should last_error_ be set on parse failure? ideally during the
-    // parsing the error should be set so it can be printed later
+    // last_error_ should already have been set if parsing is failing
     return !status;
   }
 

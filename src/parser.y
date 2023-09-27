@@ -33,7 +33,6 @@
    * @param target Target to assign result to
    * @param left Left operand
    * @param right Right operand
-   * void parser::error(const parser::location_type& loc, const std::string& msg)
    */
   #define PDCALC_YY_SAFE_DIVIDE(target, left, right) \
     do { \
