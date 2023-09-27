@@ -39,8 +39,6 @@ add_custom_command(
     # also no need for bison-bridge if we are using the C++ Bison parser.
     COMMAND
         ${PDCALC_FLEX} -CFe --noyywrap --nounistd --warn
-            # TODO: may remove --header-file later when unneeded
-            --header-file=${PDCALC_INCLUDE_DIR}/pdcalc/${PDCALC_LEXER_HEADER}
             -o ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_SOURCE}
             ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_INPUT}
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_INPUT}

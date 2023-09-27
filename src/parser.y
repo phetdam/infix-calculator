@@ -54,10 +54,11 @@
  *
  * Location tracking is enabled and as recommended by the Bison documentation,
  * the parser's parse() function takes the pdcalc parse driver as a parameter.
-*
+ *
  * Requiring Bison 3.2 stops unnecessary stack.hh generation. For Bison 3.6+,
  * it is better for parse.error to have the value of detailed. Lookahead
- * correction enabled for more accurate error reporting of location.
+ * correction enabled for more accurate error reporting of location. The
+ * api.location.file %define is used to prevent location.hh generation.
  */
 %require "3.2"
 %language "c++"
@@ -67,6 +68,7 @@
 %define parse.lac full
 %define parse.trace
 %locations
+%define api.location.file none
 %param { pdcalc::parse_driver& driver }
 
 /* Token definitions */
