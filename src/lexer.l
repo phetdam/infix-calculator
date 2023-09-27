@@ -84,7 +84,7 @@ RPAREN         ")"
 %{
   // location setup code run before scanning. PDCALC_YYLEX is a friend of the
   // pdcalc::parse_driver class and so can update the location_ member directly
-  auto& loc = parse_driver.location_;
+  auto& loc = driver.location_;
   // move start position onto previous end position
   loc.step();
 %}
@@ -142,9 +142,10 @@ namespace pdcalc {
  *
  * @param input_file Input file to read. If empty or "-", `stdin` is used.
  * @param enable_debug `true` to turn on lexer tracing, default `false`
- * @returns `true` on success, `false` on failure
+ * @returns `true` on success, `false` on failure and sets `last_error_`
  */
-void parse_driver::lex_setup(const std::string& input_file, bool enable_debug)
+bool parse_driver::lex_setup(
+  const std::string& input_file, bool enable_debug) noexcept
 {
   // enable/disable debugging. note yy_flex_debug declaration is not exported
   // in the Flex-generated lexer.yy.h header, so we have to implement this
@@ -152,13 +153,17 @@ void parse_driver::lex_setup(const std::string& input_file, bool enable_debug)
   // TODO: use yyset_debug instead, which is exported in lexer.yy.h
   yy_flex_debug = enable_debug;
   // empty file or "-" to read from stdin. latter follows POSIX conventions
-  if (input_file.empty() || input_file == "-")
+  if (input_file.empty() || input_file == "-") {
     yyin = stdin;
+    return true;
+  }
   // otherwise, attempt to read from file. throw on error
-  else if ((yyin = std::fopen(input_file.c_str(), "r")) == nullptr)
-    throw std::runtime_error{
-      "Error opening " + input_file + ": " + std::string{std::strerror(errno)}
-    };
+  if ((yyin = std::fopen(input_file.c_str(), "r")) == nullptr) {
+    last_error_ =
+      "Error opening " + input_file + ": " + std::string{std::strerror(errno)};
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -167,13 +172,16 @@ void parse_driver::lex_setup(const std::string& input_file, bool enable_debug)
  * Currently, all this does is close `yyin` unless `yyin` is `stdin`.
  *
  * @param input_file Input file passed to `lex_setup`. Used in error reporting.
+ * @returns `true` on success, `false` on failure and sets `last_error_`
  */
-void parse_driver::lex_cleanup(const std::string& input_file)
+bool parse_driver::lex_cleanup(const std::string& input_file) noexcept
 {
-  if (yyin != stdin && std::fclose(yyin))
-    throw std::runtime_error{
-      "Error closing " + input_file + ": " + std::string{std::strerror(errno)}
-    };
+  if (yyin != stdin && std::fclose(yyin)) {
+    last_error_ =
+      "Error closing " + input_file + ": " + std::string{std::strerror(errno)};
+    return false;
+  }
+  return true;
 }
 
 }  // namespace pdcalc

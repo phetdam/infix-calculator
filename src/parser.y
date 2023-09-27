@@ -19,25 +19,32 @@
   #include <iostream>
   PDCALC_MSVC_WARNING_POP()
 
+  #include <sstream>
+
   #include "pdcalc/parser.h"
 
   /**
    * Assign result of division to a target while handling divide by zero.
+   *
+   * On error, the parse driver's last error is updated.
    *
    * @note This should only be used from within the Bison-generated parser.
    *
    * @param target Target to assign result to
    * @param left Left operand
    * @param right Right operand
-   * @param
+   * void parser::error(const parser::location_type& loc, const std::string& msg)
    */
   #define PDCALC_YY_SAFE_DIVIDE(target, left, right) \
     do { \
       if (right) \
         target = (left) / (right); \
       else { \
-        std::cerr << "Error: " << (left) << " / " << (right) << \
-          " is division by zero" << std::endl; \
+        error( \
+          driver.location_, \
+          std::to_string(left) + " / " + std::to_string(right) + \
+            " is division by zero" \
+        ); \
         YYABORT; \
       } \
     } \
@@ -61,7 +68,7 @@
 %define parse.lac full
 %define parse.trace
 %locations
-%param { pdcalc::parse_driver& parse_driver }
+%param { pdcalc::parse_driver& driver }
 
 /* Token definitions */
 %token <double> FLOATING
@@ -211,14 +218,16 @@ namespace yy {
 /**
  * User-defined error handler.
  *
- * Currently, all it does is print the location and exception message.
+ * The parse driver's last error member is updated with location + error.
  *
  * @param loc Bison error location
  * @param msg Bison exception error message
  */
 void parser::error(const parser::location_type& loc, const std::string& msg)
 {
-  std::cerr << "Error: " << loc << ": " << msg << std::endl;
+  std::stringstream ss;
+  ss << loc << ": " << msg;
+  driver.last_error_ = ss.str();
 }
 
 }  // namespace yy

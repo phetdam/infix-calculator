@@ -8,6 +8,8 @@
 #ifndef PDCALC_PARSER_H_
 #define PDCALC_PARSER_H_
 
+#include <string>
+
 /**
  * `parse_driver` forward declaration to satisfy the `yy::parser` definition.
  *
@@ -41,7 +43,7 @@ namespace pdcalc { class parse_driver; }  // namespace pdcalc
  *
  * Should be a comma-separated list of function arguments.
  */
-#define PDCALC_YYLEX_ARGS pdcalc::parse_driver& parse_driver
+#define PDCALC_YYLEX_ARGS pdcalc::parse_driver& driver
 
 /**
  * Macro declaring `yylex` in the format the Bison parser expects.
@@ -105,12 +107,16 @@ public:
     // parameter must be an address to a non-const std::string
     location_.initialize(&input_file);
     // perform Flex lexer setup, create Bison parser, set debug level, parse
-    lex_setup(input_file, trace_lexer);
+    if (!lex_setup(input_file, trace_lexer))
+      return false;
     yy::parser parser{*this};
     parser.set_debug_level(trace_parser);
     auto status = parser.parse();
     // perform Flex lexer cleanup + return
-    lex_cleanup(input_file);
+    if (!lex_cleanup(input_file))
+      return false;
+    // TODO: should last_error_ be set on parse failure? ideally during the
+    // parsing the error should be set so it can be printed later
     return !status;
   }
 
@@ -144,20 +150,32 @@ public:
     return parse(input_file, trace_lexer, trace_parser);
   }
 
-  // allow lexer to access to the parse driver members for location update.
-  // note we use (::PDCALC_YYLEX) to tell compiler PDCALC_YYLEX is in the
+  // allow lexer to access to the parse driver members to update location +
+  // error note we use (::PDCALC_YYLEX) to tell compiler PDCALC_YYLEX is in the
   // global namespace, not in the current enclosing pdcalc namespace
   friend PDCALC_YYLEX_RETURN (::PDCALC_YYLEX)(PDCALC_YYLEX_ARGS);
+  // allow parser to access parse driver members to update location + error
+  friend class yy::parser;
+
+  /**
+   * Return a message describing the last error that occurred.
+   *
+   * Errors can occur before, during, or after parsing.
+   */
+  const auto& last_error() const noexcept { return last_error_; }
 
 private:
+  yy::location location_;
+  std::string last_error_;
+
   /**
    * Perform setup for the Flex lexer.
    *
    * @param input_file Input file to read. If empty or "-", `stdin` is used.
    * @param enable_debug `true` to turn on lexer tracing, default `false`
-   * @returns `true` on success, `false` on failure
+   * @returns `true` on success, `false` on failure and sets `last_error_`
    */
-  void lex_setup(const std::string& input_file, bool enable_debug);
+  bool lex_setup(const std::string& input_file, bool enable_debug) noexcept;
 
   /**
    * Perform cleanup for the Flex lexer.
@@ -166,9 +184,7 @@ private:
    *
    * @param input_file Input file passed to `lex_setup`. Used in error reporting.
    */
-  void lex_cleanup(const std::string& input_file);
-
-  yy::location location_;
+  bool lex_cleanup(const std::string& input_file) noexcept;
 };
 
 }  // namespace pdcalc

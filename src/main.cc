@@ -208,14 +208,14 @@ int parse_files(
   for (const auto& input_file : input_files) {
     // file existence
     if (!std::filesystem::exists(input_file)) {
-      std::cerr << progname << ": error: " << input_file <<
-        " does not exist" << std::endl;
+      std::cerr << progname << ": " << input_file << " does not exist" <<
+        std::endl;
       return EXIT_FAILURE;
     }
     // not a directory, device, etc.
     if (!std::filesystem::is_regular_file(input_file)) {
-      std::cerr << progname << ": error: " << input_file <<
-        " is not a regular file" << std::endl;
+      std::cerr << progname << ": " << input_file << " is not a regular file" <<
+        std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -223,8 +223,7 @@ int parse_files(
   pdcalc::parse_driver parser;
   for (const auto& input_file : input_files) {
     if (!parser(input_file, trace_lexer, trace_parser)) {
-      std::cerr << progname << ": error: " << input_file <<
-        " parsing failed" << std::endl;
+      std::cerr << progname << ": " << parser.last_error() << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -258,5 +257,9 @@ int main(int argc, char** argv)
     );
   // otherwise, parse input from stdin
   pdcalc::parse_driver parser;
-  return !parser();
+  if (!parser()) {
+    std::cerr << progname << ": " << parser.last_error() << std::endl;
+    return EXIT_FAILURE;
+  }
+  return EXIT_SUCCESS;
 }
