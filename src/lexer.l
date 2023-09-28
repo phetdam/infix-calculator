@@ -130,7 +130,7 @@ RPAREN         ")"
                           loc,
                           "Unrecognized token '" + std::string{yytext} + "'"
                         };
-  /* With Bison locations turned on an EOF rule is required */
+  /* With Bison locations turned on make_YYEOF needs to be explicitly used */
 <<EOF>>                 return yy::parser::make_YYEOF(loc);
 
 %%
