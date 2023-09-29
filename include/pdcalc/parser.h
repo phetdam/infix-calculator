@@ -75,18 +75,20 @@ class parse_driver {
 public:
 
   /**
-   * Parse input from `stdin` without tracing.
+   * Parse input from `stdin`.
+   *
+   * @param enable_trace `true` to enable lexer and parser tracing
    */
-  bool parse()
+  bool parse(bool enable_trace = false)
   {
-    return parse("", false, false);
+    return parse("", enable_trace);
   }
 
   /**
    * Parse the specified input file.
    *
    * @param input_file File to read input from, empty or "-" for `stdin`
-   * @param enable_trace `true` to enable lexer and parse tracing
+   * @param enable_trace `true` to enable lexer and parser tracing
    */
   bool parse(const std::string& input_file, bool enable_trace = false)
   {
@@ -119,15 +121,20 @@ public:
   }
 
   /**
-   * Parse input from `stdin` without tracing.
+   * Parse input from `stdin`.
+   *
+   * @param enable_trace `true` to enable lexer and parser tracing
    */
-  auto operator()() { return parse(); }
+  auto operator()(bool enable_trace = false)
+  {
+    return parse(enable_trace);
+  }
 
   /**
    * Parse the specified input file.
    *
    * @param input_file File to read input from, empty or "-" for `stdin`
-   * @param enable_trace `true` to enable lexer and parse tracing
+   * @param enable_trace `true` to enable lexer and parser tracing
    */
   auto operator()(const std::string& input_file, bool enable_trace = false)
   {
