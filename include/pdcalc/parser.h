@@ -78,6 +78,7 @@ public:
    * Parse input from `stdin`.
    *
    * @param enable_trace `true` to enable lexer and parser tracing
+   * @returns `true` on success, `false` on failure
    */
   bool parse(bool enable_trace = false)
   {
@@ -89,6 +90,7 @@ public:
    *
    * @param input_file File to read input from, empty or "-" for `stdin`
    * @param enable_trace `true` to enable lexer and parser tracing
+   * @returns `true` on success, `false` on failure
    */
   bool parse(const std::string& input_file, bool enable_trace = false)
   {
@@ -124,6 +126,7 @@ public:
    * Parse input from `stdin`.
    *
    * @param enable_trace `true` to enable lexer and parser tracing
+   * @returns `true` on success, `false` on failure
    */
   auto operator()(bool enable_trace = false)
   {
@@ -135,6 +138,7 @@ public:
    *
    * @param input_file File to read input from, empty or "-" for `stdin`
    * @param enable_trace `true` to enable lexer and parser tracing
+   * @returns `true` on success, `false` on failure
    */
   auto operator()(const std::string& input_file, bool enable_trace = false)
   {
