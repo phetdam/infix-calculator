@@ -101,10 +101,9 @@ public:
    * @param trace_parser `true` to enable parser tracing
    * @returns `true` on success, `false` on failure
    */
-  bool parse(std::string input_file, bool trace_lexer, bool trace_parser)
+  bool parse(const std::string& input_file, bool trace_lexer, bool trace_parser)
   {
-    // initialize Bison parser location for location tracking. note that the
-    // parameter must be an address to a non-const std::string
+    // initialize Bison parser location for location tracking
     location_.initialize(&input_file);
     // perform Flex lexer setup, create Bison parser, set debug level, parse
     if (!lex_setup(input_file, trace_lexer))
