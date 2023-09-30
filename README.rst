@@ -5,7 +5,7 @@ infix-calculator
 
 A typical command-line infix calculator.
 
-Intended as a hands-on project to get familiar with Flex_ and Bison_.
+Intended as a hands-on C++ project to get familiar with Flex_ and Bison_.
 
 .. _Flex: https://github.com/westes/flex
 .. _Bison: https://www.gnu.org/software/bison/
@@ -19,6 +19,10 @@ arithmetic and logical operations, with C-style operator precedence. Allows line
 comments within input files and grouping of subexpressions with parentheses.
 
 Maybe in the future I will be able to support name assignment.
+
+The calculator parser is built as a separate static or shared library that the
+calculator command-line tool links against. PIMPL is used to provide a stable
+ABI and prevent leaking Flex + Bison generated names and types into user code.
 
 Building from source
 --------------------
@@ -55,10 +59,6 @@ Simply typing ``./build.sh`` will build unoptimized binaries with debug symbols.
 
 Windows
 ~~~~~~~
-
-   Currently, please add ``-Ca "-DBUILD_SHARED_LIBS=0"`` to the build script.
-   DLL export macros have not yet been written to correctly handling the
-   exporting of symbols when the support library is built shared.
 
 Building is easy with the provided ``build.bat`` build script. For usage, type
 
