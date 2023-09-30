@@ -71,7 +71,6 @@ namespace pdcalc {
  */
 class PDCALC_API parse_driver {
 public:
-
   /**
    * Parse input from `stdin`.
    *
