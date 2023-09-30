@@ -25,7 +25,11 @@ calc_parser::calc_parser() : impl_{new calc_parser_impl} {}
  *
  * Nothing interesting here.
  */
+#if defined(PDCALC_RAW_PIMPL)
+calc_parser::~calc_parser() { delete impl_; }
+#else
 calc_parser::~calc_parser() = default;
+#endif  // !defined(PDCALC_RAW_PIMPL)
 
 /**
  * Parse the specified input file.

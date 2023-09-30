@@ -8,11 +8,15 @@
 #ifndef PDCALC_CALC_PARSER_H_
 #define PDCALC_CALC_PARSER_H_
 
-#include <memory>
 #include <string>
 
 #include "pdcalc/dllexport.h"
 #include "pdcalc/warnings.h"
+
+// when using raw pointer for PIMPL, don't need <memory>
+#ifndef PDCALC_RAW_PIMPL
+#include <memory>
+#endif  // PDCALC_RAW_PIMPL
 
 namespace pdcalc {
 
@@ -118,12 +122,17 @@ public:
   const std::string& last_error() const noexcept;
 
 private:
+  // if requested, use raw instead of STL unique_ptr to support PIMPL
+#if defined(PDCALC_RAW_PIMPL)
+  calc_parser_impl* impl_;
+#else
   // MSVC emits C4251 complaining that DLL-interface is needed. we're already
   // using PIMPL, anything else STL-related is a Microsoft problem
   PDCALC_MSVC_WARNING_PUSH()
   PDCALC_MSVC_WARNING_DISABLE(4251)
   std::unique_ptr<calc_parser_impl> impl_;
   PDCALC_MSVC_WARNING_POP()
+#endif  // !defined(PDCALC_RAW_PIMPL)
 };
 
 }  // namespace pdcalc
