@@ -22,8 +22,9 @@ namespace pdcalc {
 bool calc_parser_impl::parse(
   const std::string& input_file, bool trace_lexer, bool trace_parser)
 {
-  // initialize Bison parser location for location tracking
+  // initialize Bison parser location for location tracking + reset last error
   location_.initialize(&input_file);
+  last_error_ = "";
   // perform Flex lexer setup, create Bison parser, set debug level, parse
   if (!lex_setup(input_file, trace_lexer))
     return false;

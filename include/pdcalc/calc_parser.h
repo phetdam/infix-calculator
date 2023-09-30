@@ -113,7 +113,7 @@ public:
   }
 
   /**
-   *
+   * Return the last error encountered by the parser.
    */
   const std::string& last_error() const noexcept;
 
