@@ -10,6 +10,8 @@
 
 #include <string>
 
+#include "pdcalc/dllexport.h"
+
 /**
  * `parse_driver` forward declaration to satisfy the `yy::parser` definition.
  *
@@ -66,12 +68,8 @@ namespace pdcalc {
  * `pdcalc` infix calculator parse driver.
  *
  * Encapsulates the Flex/Bison generated lexer + parser.
- *
- * @note This interface is highly subject to change. There is consideration
- *  being put into more of a functional interface, with this class being used
- *  instead as a kind of passive parsing context object
  */
-class parse_driver {
+class PDCALC_API parse_driver {
 public:
 
   /**
@@ -105,22 +103,7 @@ public:
    * @param trace_parser `true` to enable parser tracing
    * @returns `true` on success, `false` on failure
    */
-  bool parse(const std::string& input_file, bool trace_lexer, bool trace_parser)
-  {
-    // initialize Bison parser location for location tracking
-    location_.initialize(&input_file);
-    // perform Flex lexer setup, create Bison parser, set debug level, parse
-    if (!lex_setup(input_file, trace_lexer))
-      return false;
-    yy::parser parser{*this};
-    parser.set_debug_level(trace_parser);
-    auto status = parser.parse();
-    // perform Flex lexer cleanup + return
-    if (!lex_cleanup(input_file))
-      return false;
-    // last_error_ should already have been set if parsing is failing
-    return !status;
-  }
+  bool parse(const std::string& input_file, bool trace_lexer, bool trace_parser);
 
   /**
    * Parse input from `stdin`.
