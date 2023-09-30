@@ -34,6 +34,9 @@ project(
     LANGUAGES C CXX
 )
 
+# build support library as shared by default
+option(BUILD_SHARED_LIBS "Build pdcalc library as shared" ON)
+
 # default build type is Debug
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)

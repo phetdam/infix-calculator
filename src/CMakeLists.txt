@@ -53,4 +53,10 @@ if(MSVC)
         COMPILE_OPTIONS "/wd4127"
     )
 endif()
-add_executable(pdcalc main.cc ${PDCALC_LEXER_SOURCE} ${PDCALC_PARSER_SOURCE})
+# pdcalc library implementing parser
+add_library(pdcalc_lib ${PDCALC_LEXER_SOURCE} ${PDCALC_PARSER_SOURCE})
+set_target_properties(pdcalc_lib PROPERTIES OUTPUT_NAME pdcalc)
+# pdcalc CLI frontend
+add_executable(pdcalc_bin main.cc)
+target_link_libraries(pdcalc_bin PRIVATE pdcalc_lib)
+set_target_properties(pdcalc_bin PROPERTIES OUTPUT_NAME pdcalc)
