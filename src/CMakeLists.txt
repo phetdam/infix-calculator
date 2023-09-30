@@ -50,7 +50,7 @@ add_custom_command(
 if(MSVC)
     set_source_files_properties(
         ${PDCALC_PARSER_SOURCE} PROPERTIES
-        COMPILE_OPTIONS /wd4127
+        COMPILE_OPTIONS "/wd4127"
     )
 endif()
 add_executable(pdcalc main.cc ${PDCALC_LEXER_SOURCE} ${PDCALC_PARSER_SOURCE})

@@ -157,7 +157,7 @@ bool parse_driver::lex_setup(
     yyin = stdin;
     return true;
   }
-  // otherwise, attempt to read from file. throw on error
+  // otherwise, attempt to read from file. handle error
   if ((yyin = std::fopen(input_file.c_str(), "r")) == nullptr) {
     last_error_ =
       "Error opening " + input_file + ": " + std::string{std::strerror(errno)};
