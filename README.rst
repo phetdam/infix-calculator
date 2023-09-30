@@ -56,6 +56,10 @@ Simply typing ``./build.sh`` will build unoptimized binaries with debug symbols.
 Windows
 ~~~~~~~
 
+   Currently, please add ``-Ca "-DBUILD_SHARED_LIBS=0"`` to the build script.
+   DLL export macros have not yet been written to correctly handling the
+   exporting of symbols when the support library is built shared.
+
 Building is easy with the provided ``build.bat`` build script. For usage, type
 
 .. code:: shell
