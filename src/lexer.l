@@ -31,7 +31,7 @@
 
   #include <string>
 
-  #include "pdcalc/parser.h"
+  #include "calc_parser_impl.h"
 
   /**
    * User-defined action run after token match before its rule action.
@@ -83,7 +83,7 @@ RPAREN         ")"
 
 %{
   // location setup code run before scanning. PDCALC_YYLEX is a friend of the
-  // pdcalc::parse_driver class and so can update the location_ member directly
+  // pdcalc::calc_parser_impl class and so can update the location_ member directly
   auto& loc = driver.location_;
   // move start position onto previous end position
   loc.step();
@@ -144,7 +144,7 @@ namespace pdcalc {
  * @param enable_debug `true` to turn on lexer tracing, default `false`
  * @returns `true` on success, `false` on failure and sets `last_error_`
  */
-bool parse_driver::lex_setup(
+bool calc_parser_impl::lex_setup(
   const std::string& input_file, bool enable_debug) noexcept
 {
   // enable/disable debugging. note yy_flex_debug declaration is not exported
@@ -174,7 +174,7 @@ bool parse_driver::lex_setup(
  * @param input_file Input file passed to `lex_setup`. Used in error reporting.
  * @returns `true` on success, `false` on failure and sets `last_error_`
  */
-bool parse_driver::lex_cleanup(const std::string& input_file) noexcept
+bool calc_parser_impl::lex_cleanup(const std::string& input_file) noexcept
 {
   if (yyin != stdin && std::fclose(yyin)) {
     last_error_ =

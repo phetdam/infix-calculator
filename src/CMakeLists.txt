@@ -54,7 +54,13 @@ if(MSVC)
     )
 endif()
 # pdcalc library implementing parser
-add_library(pdcalc_lib parser.cc ${PDCALC_LEXER_SOURCE} ${PDCALC_PARSER_SOURCE})
+add_library(
+    pdcalc_lib
+        ${PDCALC_LEXER_SOURCE}
+        ${PDCALC_PARSER_SOURCE}
+        calc_parser.cc
+        calc_parser_impl.cc
+)
 set_target_properties(
     pdcalc_lib PROPERTIES
         OUTPUT_NAME pdcalc

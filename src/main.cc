@@ -17,7 +17,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "pdcalc/parser.h"
+#include "pdcalc/calc_parser.h"
 #include "pdcalc/version.h"
 
 namespace {
@@ -220,7 +220,7 @@ int parse_files(
     }
   }
   // parse in a batch
-  pdcalc::parse_driver parser;
+  pdcalc::calc_parser parser;
   for (const auto& input_file : input_files) {
     if (!parser(input_file, trace_lexer, trace_parser)) {
       std::cerr << progname << ": " << parser.last_error() << std::endl;
@@ -256,7 +256,7 @@ int main(int argc, char** argv)
       opt_map.find("trace_parser") != opt_map.end()
     );
   // otherwise, parse input from stdin
-  pdcalc::parse_driver parser;
+  pdcalc::calc_parser parser;
   if (!parser()) {
     std::cerr << progname << ": " << parser.last_error() << std::endl;
     return EXIT_FAILURE;

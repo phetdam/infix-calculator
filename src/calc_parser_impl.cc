@@ -5,7 +5,9 @@
  * @copyright MIT License
  */
 
-#include "pdcalc/parser.h"
+#include "calc_parser_impl.h"
+
+#include <string>
 
 namespace pdcalc {
 
@@ -17,7 +19,7 @@ namespace pdcalc {
  * @param trace_parser `true` to enable parser tracing
  * @returns `true` on success, `false` on failure
  */
-bool parse_driver::parse(
+bool calc_parser_impl::parse(
   const std::string& input_file, bool trace_lexer, bool trace_parser)
 {
   // initialize Bison parser location for location tracking

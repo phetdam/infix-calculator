@@ -21,7 +21,7 @@
 
   #include <sstream>
 
-  #include "pdcalc/parser.h"
+  #include "calc_parser_impl.h"
 
   /**
    * Assign result of division to a target while handling divide by zero.
@@ -78,7 +78,7 @@
 %define parse.trace
 %locations
 %define api.location.file none
-%param { pdcalc::parse_driver& driver }
+%param { pdcalc::calc_parser_impl& driver }
 
 /* Token definitions */
 %token <double> FLOATING
