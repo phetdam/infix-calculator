@@ -7,7 +7,7 @@
 
 #include "calc_parser_impl.h"
 
-#include <string>
+#include <filesystem>
 
 namespace pdcalc {
 
@@ -20,19 +20,21 @@ namespace pdcalc {
  * @returns `true` on success, `false` on failure
  */
 bool calc_parser_impl::parse(
-  const std::string& input_file, bool trace_lexer, bool trace_parser)
+  const std::filesystem::path& input_file, bool trace_lexer, bool trace_parser)
 {
+  // need file path as string
+  auto path_string = input_file.string();
   // initialize Bison parser location for location tracking + reset last error
-  location_.initialize(&input_file);
+  location_.initialize(&path_string);
   last_error_ = "";
   // perform Flex lexer setup, create Bison parser, set debug level, parse
-  if (!lex_setup(input_file, trace_lexer))
+  if (!lex_setup(path_string, trace_lexer))
     return false;
   yy::parser parser{*this};
   parser.set_debug_level(trace_parser);
   auto status = parser.parse();
   // perform Flex lexer cleanup + return
-  if (!lex_cleanup(input_file))
+  if (!lex_cleanup(path_string))
     return false;
   // last_error_ should already have been set if parsing is failing
   return !status;

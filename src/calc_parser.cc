@@ -7,6 +7,7 @@
 
 #include "pdcalc/calc_parser.h"
 
+#include <filesystem>
 #include <string>
 
 #include "calc_parser_impl.h"
@@ -40,7 +41,7 @@ calc_parser::~calc_parser() = default;
  * @returns `true` on success, `false` on failure
  */
 bool calc_parser::parse(
-  const std::string& input_file, bool trace_lexer, bool trace_parser)
+  const std::filesystem::path& input_file, bool trace_lexer, bool trace_parser)
 {
   return impl_->parse(input_file, trace_lexer, trace_parser);
 }

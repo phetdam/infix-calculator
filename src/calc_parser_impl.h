@@ -8,6 +8,7 @@
 #ifndef PDCALC_CALC_PARSER_IMPL_H_
 #define PDCALC_CALC_PARSER_IMPL_H_
 
+#include <filesystem>
 #include <string>
 
 /**
@@ -80,7 +81,10 @@ public:
    * @param trace_parser `true` to enable parser tracing
    * @returns `true` on success, `false` on failure
    */
-  bool parse(const std::string& input_file, bool trace_lexer, bool trace_parser);
+  bool parse(
+    const std::filesystem::path& input_file,
+    bool trace_lexer,
+    bool trace_parser);
 
   // allow lexer to access to the parse driver members to update location +
   // error note we use (::PDCALC_YYLEX) to tell compiler PDCALC_YYLEX is in the
