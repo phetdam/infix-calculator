@@ -74,6 +74,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 # find Flex + Bison
 include(FindFlexBison)
+# find Google Test
+set(PDCALC_GTEST_VERSION 1.10)
+find_package(GTest ${PDCALC_GTEST_VERSION})
 # set compiler options
 include(ConfigCompile)
 
@@ -95,5 +98,17 @@ include_directories(${PDCALC_INCLUDE_DIR})
 set(PDCALC_NAMESPACE_INCLUDE_DIR ${PDCALC_INCLUDE_DIR}/pdcalc)
 # path to source directory
 set(PDCALC_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
+# path to test data directory
+set(PDCALC_TEST_DATA_DIR ${CMAKE_SOURCE_DIR}/data)
 
+# add src, add test only if Google Test is found
 add_subdirectory(src)
+if(GTest_FOUND)
+    enable_testing()
+    add_subdirectory(test)
+else()
+    message(
+        STATUS
+        "Skipping tests as Google Test ${PDCALC_GTEST_VERSION} was not found"
+    )
+endif()
