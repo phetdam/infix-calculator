@@ -1,0 +1,21 @@
+# sample.in.3
+#
+# Author: Derek Huang
+# Summary: Sample input #3 for pdcalc
+# Copyright: MIT License
+#
+
+# This input focuses mostly on expressions involving function calls.
+
+# <double> 0.08588339208338497
+3.4 / (sqrt(4) + sqrt(199 * 7.1));
+# <double> 0.1486594702712856
+sin(19 * (sqrt(1 * 3.4 / 3) + 4.5)) * tan(9.3 * (3 + 1.) / 3);
+# <long> 15
+2 + max(min(4, 5 + 12), 13);
+# <double> 1.8708286933869707
+sqrt(max(3.5, 1.3 * sin(3.11 * 15 - min(3.2, cos(9 / 12.3)))));
+# <double> 38.6887617523621
+sqrt(4) * (sqrt(18 * cos(12)) + tan(1) + tan(1.2) * 5.4);
+# <bool> false  # parentheses not required as + precedes <
+(34 + 14.2) < sqrt(4) * (sqrt(18 * cos(12)) + tan(1) + tan(1.2) * 5.4);

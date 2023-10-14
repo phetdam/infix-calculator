@@ -92,7 +92,7 @@ TEST_P(CalcParserPureTest, PureParseTest)
 INSTANTIATE_TEST_SUITE_P(
   BaseSuite,
   CalcParserPureTest,
-  ::testing::Values("sample.in.1", "sample.in.2")
+  ::testing::Values("sample.in.1", "sample.in.2", "sample.in.3")
 );
 
 }  // namespace

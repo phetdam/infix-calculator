@@ -89,8 +89,9 @@ NEWLINES       \n+
   /* Arithmetic literals */
 {INT}                   return yy::parser::make_INTEGRAL(std::stol(yytext), loc);
 {FLOAT}                 return yy::parser::make_FLOATING(std::stod(yytext), loc);
-  /* Semicolon */
+  /* Grammar tokens */
 ";"                     return yy::parser::make_SEMICOLON(loc);
+","                     return yy::parser::make_COMMA(loc);
   /* Arithmetic operators */
 "+"                     return yy::parser::make_PLUS(loc);
 "-"                     return yy::parser::make_MINUS(loc);
@@ -121,6 +122,14 @@ NEWLINES       \n+
   /* Parentheses */
 "("                     return yy::parser::make_LPAREN(loc);
 ")"                     return yy::parser::make_RPAREN(loc);
+  /* Assignment operator */
+  /* "="                     return yy::parser::make_ASSIGN(loc); */
+  /* Known types */
+  /* "long"                  return yy::parser::make_T_LONG(loc); */
+  /* int used as a synonym for long */
+  /* "int"                   return yy::parser::make_T_LONG(loc); */
+  /* "double"                return yy::parser::make_T_DOUBLE(loc); */
+  /* "bool"                  return yy::parser::make_T_BOOL(loc); */
   /* Start parsing line comment when '#' is seen */
 "#"                     BEGIN(LINE_COMMENT);
   /* Ignore comment contents until newline */
@@ -131,7 +140,15 @@ NEWLINES       \n+
   /* Skipped tokens */
 {BLANKS}                loc.step();
 {NEWLINES}              loc.lines(yyleng); loc.step();
-  /*{IDEN}                  printf("An identifier: %s\n", yytext); */
+  /* Built-in function names */
+"sqrt"                  return yy::parser::make_F_SQRT(loc);
+"max"                   return yy::parser::make_F_MAX(loc);
+"min"                   return yy::parser::make_F_MIN(loc);
+"sin"                   return yy::parser::make_F_SIN(loc);
+"cos"                   return yy::parser::make_F_COS(loc);
+"tan"                   return yy::parser::make_F_TAN(loc);
+  /* Identifiers */
+  /* {IDEN}                  return yy::parser::make_IDEN(yytext, loc); */
   /* Default rule */
 .                       throw yy::parser::syntax_error{
                           loc,

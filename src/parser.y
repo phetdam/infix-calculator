@@ -19,7 +19,10 @@
   #include <iostream>
   PDCALC_MSVC_WARNING_POP()
 
+  #include <algorithm>
+  #include <cmath>
   #include <sstream>
+  #include <string>
 
   #include "calc_parser_impl.h"
 
@@ -98,6 +101,7 @@
 %token LPAREN "("
 %token RPAREN ")"
 %token EQUALS "=="
+/* %token ASSIGN "=" */
 %token AND "&&"
 %token OR "||"
 %token NOT "!"
@@ -107,6 +111,20 @@
 %token GEQUALS ">="
 %token NOT_EQUALS "!="
 %token SEMICOLON ";"
+%token COMMA ","
+/* Identifiers */
+/* %token <std::string> IDEN */
+/* Type tokens */
+/* %token T_LONG "long" */
+/* %token T_BOOL "bool" */
+/* %token T_DOUBLE "double" */
+/* Built-in function names */
+%token F_SQRT "sqrt"
+%token F_MAX "max"
+%token F_MIN "min"
+%token F_SIN "sin"
+%token F_COS "cos"
+%token F_TAN "tan"
 
 /* Associativity and precedence declarations (C-style) */
 %left "||"
@@ -129,7 +147,7 @@
  */
 %nterm <double> d_expr
 %nterm <bool> b_expr
-%nterm <int> i_expr
+%nterm <long> i_expr
 
 %%
 
@@ -160,6 +178,9 @@ i_expr:
 | "~" i_expr            { $$ = ~$2; }
 | i_expr "<<" i_expr    { $$ = $1 << $3; }
 | i_expr ">>" i_expr    { $$ = $1 >> $3; }
+/* Binary function calls */
+| "max" "(" i_expr "," i_expr ")"    { $$ = std::max($3, $5); }
+| "min" "(" i_expr "," i_expr ")"    { $$ = std::min($3, $5); }
 
 /* Float arithmetic expression rule */
 d_expr:
@@ -179,6 +200,27 @@ d_expr:
 | i_expr "-" d_expr    { $$ = $1 - $3; }
 | i_expr "*" d_expr    { $$ = $1 * $3; }
 | i_expr "/" d_expr    { PDCALC_YY_SAFE_DIVIDE($$, $1, $3); }
+/* Unary function calls */
+| "sqrt" "(" d_expr ")"    { $$ = std::sqrt($3); }
+| "sqrt" "(" i_expr ")"    { $$ = std::sqrt($3); }
+| "sin" "(" d_expr ")"     { $$ = std::sin($3); }
+| "sin" "(" i_expr ")"     { $$ = std::sin($3); }
+| "cos" "(" d_expr ")"     { $$ = std::cos($3); }
+| "cos" "(" i_expr ")"     { $$ = std::cos($3); }
+| "tan" "(" d_expr ")"     { $$ = std::tan($3); }
+| "tan" "(" i_expr ")"     { $$ = std::tan($3); }
+/*
+ * Binary function calls.
+ *
+ * Note that in some cases, explicit template type is specified since the min +
+ * max templates have a (const T& a, const T& b) signature.
+ */
+| "max" "(" d_expr "," d_expr ")"    { $$ = std::max($3, $5); }
+| "max" "(" d_expr "," i_expr ")"    { $$ = std::max<double>($3, $5); }
+| "max" "(" i_expr "," d_expr ")"    { $$ = std::max<double>($3, $5); }
+| "min" "(" d_expr "," d_expr ")"    { $$ = std::min($3, $5); }
+| "min" "(" d_expr "," i_expr ")"    { $$ = std::min<double>($3, $5); }
+| "min" "(" i_expr "," d_expr ")"    { $$ = std::min<double>($3, $5); }
 
 /* Boolean expression rule */
 b_expr:
