@@ -140,83 +140,83 @@ input:
 
 /* Statement rule */
 stmt:
-  ";"           /* empty statement */
+  ";"
 | i_expr ";"    { std::cout << "<long> " << $1 << std::endl; }
 | d_expr ";"    { std::cout << "<double> " << $1 << std::endl; }
 | b_expr ";"    { PDCALC_YY_PRINT_BOOL($1); }
 
 /* Integral expression rule */
 i_expr:
-  INTEGRAL                          { $$ = $1; }
-| "(" i_expr[expr] ")"              { $$ = $expr; }
-| i_expr[left] "+" i_expr[right]    { $$ = $left + $right; }
-| i_expr[left] "-" i_expr[right]    { $$ = $left - $right; }
-| i_expr[left] "*" i_expr[right]    { $$ = $left * $right; }
-| i_expr[left] "/" i_expr[right]    { PDCALC_YY_SAFE_DIVIDE($$, $left, $right); }
-| i_expr[left] "%" i_expr[right]    { $$ = $left % $right; }
-| i_expr[left] "&" i_expr[right]    { $$ = $left & $right; }
-| i_expr[left] "^" i_expr[right]    { $$ = $left ^ $right; }
-| i_expr[left] "|" i_expr[right]    { $$ = $left | $right; }
-| "~" i_expr[expr]                  { $$ = ~$expr; }
-| i_expr[left] "<<" i_expr[right]   { $$ = $left << $right; }
-| i_expr[left] ">>" i_expr[right]   { $$ = $left >> $right; }
+  INTEGRAL              { $$ = $1; }
+| "(" i_expr ")"        { $$ = $2; }
+| i_expr "+" i_expr     { $$ = $1 + $3; }
+| i_expr "-" i_expr     { $$ = $1 - $3; }
+| i_expr "*" i_expr     { $$ = $1 * $3; }
+| i_expr "/" i_expr     { PDCALC_YY_SAFE_DIVIDE($$, $1, $3); }
+| i_expr "%" i_expr     { $$ = $1 % $3; }
+| i_expr "&" i_expr     { $$ = $1 & $3; }
+| i_expr "^" i_expr     { $$ = $1 ^ $3; }
+| i_expr "|" i_expr     { $$ = $1 | $3; }
+| "~" i_expr            { $$ = ~$2; }
+| i_expr "<<" i_expr    { $$ = $1 << $3; }
+| i_expr ">>" i_expr    { $$ = $1 >> $3; }
 
 /* Float arithmetic expression rule */
 d_expr:
-  FLOATING                          { $$ = $1; }
-| "(" d_expr[expr] ")"              { $$ = $expr; }
-| d_expr[left] "+" d_expr[right]    { $$ = $left + $right; }
-| d_expr[left] "-" d_expr[right]    { $$ = $left - $right; }
-| d_expr[left] "*" d_expr[right]    { $$ = $left * $right; }
-| d_expr[left] "/" d_expr[right]    { PDCALC_YY_SAFE_DIVIDE($$, $left, $right); }
+  FLOATING             { $$ = $1; }
+| "(" d_expr ")"       { $$ = $2; }
+| d_expr "+" d_expr    { $$ = $1 + $3; }
+| d_expr "-" d_expr    { $$ = $1 - $3; }
+| d_expr "*" d_expr    { $$ = $1 * $3; }
+| d_expr "/" d_expr    { PDCALC_YY_SAFE_DIVIDE($$, $1, $3); }
 /* promoting right i_expr */
-| d_expr[left] "+" i_expr[right]    { $$ = $left + $right; }
-| d_expr[left] "-" i_expr[right]    { $$ = $left - $right; }
-| d_expr[left] "*" i_expr[right]    { $$ = $left * $right; }
-| d_expr[left] "/" i_expr[right]    { PDCALC_YY_SAFE_DIVIDE($$, $left, $right); }
+| d_expr "+" i_expr    { $$ = $1 + $3; }
+| d_expr "-" i_expr    { $$ = $1 - $3; }
+| d_expr "*" i_expr    { $$ = $1 * $3; }
+| d_expr "/" i_expr    { PDCALC_YY_SAFE_DIVIDE($$, $1, $3); }
 /* promoting left i_expr */
-| i_expr[left] "+" d_expr[right]    { $$ = $left + $right; }
-| i_expr[left] "-" d_expr[right]    { $$ = $left - $right; }
-| i_expr[left] "*" d_expr[right]    { $$ = $left * $right; }
-| i_expr[left] "/" d_expr[right]    { PDCALC_YY_SAFE_DIVIDE($$, $left, $right); }
+| i_expr "+" d_expr    { $$ = $1 + $3; }
+| i_expr "-" d_expr    { $$ = $1 - $3; }
+| i_expr "*" d_expr    { $$ = $1 * $3; }
+| i_expr "/" d_expr    { PDCALC_YY_SAFE_DIVIDE($$, $1, $3); }
 
 /* Boolean expression rule */
 b_expr:
-  TRUTH                               { $$ = $1; }
-| "(" b_expr[expr] ")"                { $$ = $expr; }
+  TRUTH                 { $$ = $1; }
+| "(" b_expr ")"        { $$ = $2; }
 /* b_expr comparisons */
-| b_expr[left] "==" b_expr[right]     { $$ = ($left == $right); }
-| b_expr[left] "!=" b_expr[right]     { $$ = ($left == $right); }
-| b_expr[left] "||" b_expr[right]     { $$ = ($left || $right); }
-| b_expr[left] "&&" b_expr[right]     { $$ = ($left && $right); }
-| "!" b_expr[expr]                    { $$ = !$expr; }
+| b_expr "==" b_expr    { $$ = ($1 == $3); }
+| b_expr "!=" b_expr    { $$ = ($1 == $3); }
+| b_expr "||" b_expr    { $$ = ($1 || $3); }
+| b_expr "&&" b_expr    { $$ = ($1 && $3); }
+| "!" b_expr            { $$ = !$2; }
 /* d_expr, i_expr comparisons */
-| d_expr[left] "==" d_expr[right]     { $$ = ($left == $right); }
-| d_expr[left] "!=" d_expr[right]     { $$ = ($left != $right); }
-| i_expr[left] "==" i_expr[right]     { $$ = ($left == $right); }
-| i_expr[left] "!=" i_expr[right]     { $$ = ($left != $right); }
-| d_expr[left] "<" d_expr[right]      { $$ = ($left < $right); }
-| d_expr[left] ">" d_expr[right]      { $$ = ($left > $right); }
-| d_expr[left] "<=" d_expr[right]     { $$ = ($left <= $right); }
-| d_expr[left] ">=" d_expr[right]     { $$ = ($left >= $right); }
-| i_expr[left] "<" i_expr[right]      { $$ = ($left < $right); }
-| i_expr[left] ">" i_expr[right]      { $$ = ($left > $right); }
-| i_expr[left] "<=" i_expr[right]     { $$ = ($left <= $right); }
-| i_expr[left] ">=" i_expr[right]     { $$ = ($left >= $right); }
+| d_expr "==" d_expr    { $$ = ($1 == $3); }
+| d_expr "!=" d_expr    { $$ = ($1 != $3); }
+| i_expr "==" i_expr    { $$ = ($1 == $3); }
+| i_expr "!=" i_expr    { $$ = ($1 != $3); }
+| d_expr "<" d_expr     { $$ = ($1 < $3); }
+| d_expr ">" d_expr     { $$ = ($1 > $3); }
+| d_expr "<=" d_expr    { $$ = ($1 <= $3); }
+| d_expr ">=" d_expr    { $$ = ($1 >= $3); }
+| i_expr "<" i_expr     { $$ = ($1 < $3); }
+| i_expr ">" i_expr     { $$ = ($1 > $3); }
+| i_expr "<=" i_expr    { $$ = ($1 <= $3); }
+| i_expr ">=" i_expr    { $$ = ($1 >= $3); }
 /* d_expr left, i_expr right */
-| d_expr[left] "==" i_expr[right]     { $$ = ($left == $right); }
-| d_expr[left] "!=" i_expr[right]     { $$ = ($left != $right); }
-| d_expr[left] "<" i_expr[right]      { $$ = ($left < $right); }
-| d_expr[left] ">" i_expr[right]      { $$ = ($left > $right); }
-| d_expr[left] "<=" i_expr[right]     { $$ = ($left <= $right); }
-| d_expr[left] ">=" i_expr[right]     { $$ = ($left >= $right); }
+| d_expr "==" i_expr    { $$ = ($1 == $3); }
+| d_expr "!=" i_expr    { $$ = ($1 != $3); }
+| d_expr "<" i_expr     { $$ = ($1 < $3); }
+| d_expr ">" i_expr     { $$ = ($1 > $3); }
+| d_expr "<=" i_expr    { $$ = ($1 <= $3); }
+| d_expr ">=" i_expr    { $$ = ($1 >= $3); }
 /* i_expr left, d_expr right */
-| i_expr[left] "==" d_expr[right]     { $$ = ($left == $right); }
-| i_expr[left] "!=" d_expr[right]     { $$ = ($left != $right); }
-| i_expr[left] "<" d_expr[right]      { $$ = ($left < $right); }
-| i_expr[left] ">" d_expr[right]      { $$ = ($left > $right); }
-| i_expr[left] "<=" d_expr[right]     { $$ = ($left <= $right); }
-| i_expr[left] ">=" d_expr[right]     { $$ = ($left >= $right); }
+| i_expr "==" d_expr    { $$ = ($1 == $3); }
+| i_expr "!=" d_expr    { $$ = ($1 != $3); }
+| i_expr "<" d_expr     { $$ = ($1 < $3); }
+| i_expr ">" d_expr     { $$ = ($1 > $3); }
+| i_expr "<=" d_expr    { $$ = ($1 <= $3); }
+| i_expr ">=" d_expr    { $$ = ($1 >= $3); }
 
 %%
 
