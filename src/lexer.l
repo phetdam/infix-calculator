@@ -89,29 +89,41 @@ RPAREN         ")"
   loc.step();
 %}
 
+  /* Arithmetic literals */
 {INT}                   return yy::parser::make_INTEGRAL(std::stol(yytext), loc);
 {FLOAT}                 return yy::parser::make_FLOATING(std::stod(yytext), loc);
+  /* Semicolon */
+";"                     return yy::parser::make_SEMICOLON(loc);
+  /* Arithmetic operators */
 "+"                     return yy::parser::make_PLUS(loc);
 "-"                     return yy::parser::make_MINUS(loc);
 "*"                     return yy::parser::make_STAR(loc);
 "/"                     return yy::parser::make_SLASH(loc);
 "%"                     return yy::parser::make_PERCENT(loc);
+  /* Bitwise operators */
 "|"                     return yy::parser::make_PIPE(loc);
 "&"                     return yy::parser::make_AMPERSAND(loc);
 "^"                     return yy::parser::make_CARET(loc);
-"~"                     return yy::parser::make_TILDE(loc);
 "<<"                    return yy::parser::make_LSHIFT(loc);
 ">>"                    return yy::parser::make_RSHIFT(loc);
+"~"                     return yy::parser::make_TILDE(loc);
+  /* Comparison operators */
 "<"                     return yy::parser::make_LANGLE(loc);
 ">"                     return yy::parser::make_RANGLE(loc);
 "<="                    return yy::parser::make_LEQUALS(loc);
 ">="                    return yy::parser::make_GEQUALS(loc);
+"=="                    return yy::parser::make_EQUALS(loc);
+"!="                    return yy::parser::make_NOT_EQUALS(loc);
+  /* Boolean literals */
 "true"                  return yy::parser::make_TRUTH(true, loc);
 "false"                 return yy::parser::make_TRUTH(false, loc);
-";"                     return yy::parser::make_SEMICOLON(loc);
+  /* Boolean operators */
 "&&"                    return yy::parser::make_AND(loc);
 "||"                    return yy::parser::make_OR(loc);
 "!"                     return yy::parser::make_NOT(loc);
+  /* Parentheses */
+"("                     return yy::parser::make_LPAREN(loc);
+")"                     return yy::parser::make_RPAREN(loc);
   /* Start parsing line comment when '#' is seen */
 "#"                     BEGIN(LINE_COMMENT);
   /* Ignore comment contents until newline */
@@ -119,13 +131,11 @@ RPAREN         ")"
   /* For each commented line, update position, and return the normal lexing */
 <LINE_COMMENT>\n        loc.lines(yyleng); loc.step(); BEGIN(INITIAL);
   /* {COMMAND}               printf("A command name: %s\n", yytext); */
+  /* Skipped tokens */
 {BLANKS}                loc.step();
 {NEWLINES}              loc.lines(yyleng); loc.step();
   /*{IDEN}                  printf("An identifier: %s\n", yytext); */
-"("                     return yy::parser::make_LPAREN(loc);
-")"                     return yy::parser::make_RPAREN(loc);
-"=="                    return yy::parser::make_EQUALS(loc);
-"!="                    return yy::parser::make_NOT_EQUALS(loc);
+  /* Default rule */
 .                       throw yy::parser::syntax_error{
                           loc,
                           "Unrecognized token '" + std::string{yytext} + "'"
