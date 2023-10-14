@@ -74,9 +74,6 @@ COMMAND        @{IDEN}
  */
 BLANKS         [ \t\r]+
 NEWLINES       \n+
-LPAREN         "("
-RPAREN         ")"
-
 
 /* Rules */
 %%
