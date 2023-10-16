@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
+#include <ostream>
 #include <string_view>
 
 #include <gtest/gtest.h>
@@ -55,6 +56,8 @@ protected:
       GTEST_SKIP() << skip_reason_;
   }
 
+  // no-op stream
+  static inline std::ostream null_stream{nullptr};
   // absolute path to test data directory
   static inline const std::filesystem::path test_data_dir_{
     []
@@ -82,10 +85,12 @@ class CalcParserPureTest
 
 /**
  * Test that parsing succeeds on the given input file.
+ *
+ * `null_stream` is used as the output stream so suppress all printing.
  */
 TEST_P(CalcParserPureTest, PureParseTest)
 {
-  pdcalc::calc_parser parser;
+  pdcalc::calc_parser parser{null_stream};
   EXPECT_TRUE(parser(test_data_dir_ / GetParam()));
 }
 

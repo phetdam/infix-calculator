@@ -9,6 +9,7 @@
 #define PDCALC_CALC_PARSER_IMPL_H_
 
 #include <filesystem>
+#include <iostream>
 #include <string>
 
 /**
@@ -74,6 +75,18 @@ namespace pdcalc {
 class calc_parser_impl {
 public:
   /**
+   * Ctor.
+   *
+   * @param sink Stream to write all non-error output to, default `std::cout`
+   */
+  calc_parser_impl(std::ostream& sink = std::cout) : sink_{sink} {}
+
+  /**
+   * Return reference to stream all non-error output is written to.
+   */
+  auto& sink() const noexcept { return sink_; }
+
+  /**
    * Parse the specified input file.
    *
    * @param input_file File to read input from, empty or "-" for `stdin`
@@ -103,6 +116,7 @@ public:
 private:
   yy::location location_;
   std::string last_error_;
+  std::ostream& sink_;
 
   /**
    * Perform setup for the Flex lexer.

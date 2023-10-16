@@ -58,8 +58,8 @@
    * @param value Boolean value of an expression
    */
   #define PDCALC_YY_PRINT_BOOL(value) \
-    std::cout << "<bool> " << std::boolalpha << (value) << std::noboolalpha << \
-      std::endl;
+    driver.sink() << "<bool> " << std::boolalpha << (value) << \
+      std::noboolalpha << std::endl;
 %}
 
 /* C++ LR parser using variants handling complete symbols with error reporting.
@@ -159,8 +159,8 @@ input:
 /* Statement rule */
 stmt:
   ";"
-| i_expr ";"    { std::cout << "<long> " << $1 << std::endl; }
-| d_expr ";"    { std::cout << "<double> " << $1 << std::endl; }
+| i_expr ";"    { driver.sink() << "<long> " << $1 << std::endl; }
+| d_expr ";"    { driver.sink() << "<double> " << $1 << std::endl; }
 | b_expr ";"    { PDCALC_YY_PRINT_BOOL($1); }
 
 /* Integral expression rule */

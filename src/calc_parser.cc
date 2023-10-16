@@ -8,6 +8,7 @@
 #include "pdcalc/calc_parser.h"
 
 #include <filesystem>
+#include <ostream>
 #include <string>
 
 #include "calc_parser_impl.h"
@@ -17,9 +18,11 @@ namespace pdcalc {
 /**
  * Ctor.
  *
- * All this does is default-construct the implementation.
+ * @param sink Stream to write all non-error output to, default `std::cout`
  */
-calc_parser::calc_parser() : impl_{new calc_parser_impl} {}
+calc_parser::calc_parser(std::ostream& sink)
+  : impl_{new calc_parser_impl{sink}}
+{}
 
 /**
  * Dtor.
@@ -31,6 +34,14 @@ calc_parser::~calc_parser() { delete impl_; }
 #else
 calc_parser::~calc_parser() = default;
 #endif  // !defined(PDCALC_RAW_PIMPL)
+
+/**
+ * Return reference to stream all non-error output is written to.
+ */
+std::ostream& calc_parser::sink() const noexcept
+{
+  return impl_->sink();
+}
 
 /**
  * Parse the specified input file.

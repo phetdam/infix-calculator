@@ -13,6 +13,8 @@
 
 #include "pdcalc/dllexport.h"
 
+#include <iostream>
+
 // when using raw pointer for PIMPL, don't need <memory> or warnings macros
 #ifndef PDCALC_RAW_PIMPL
 #include <memory>
@@ -35,8 +37,10 @@ class PDCALC_API calc_parser {
 public:
   /**
    * Ctor.
+   *
+   * @param sink Stream to write all non-error output to, default `std::cout`
    */
-  calc_parser();
+  calc_parser(std::ostream& sink = std::cout);
 
   /**
    * Dtor.
@@ -47,6 +51,11 @@ public:
    * Deleted copy ctor.
    */
   calc_parser(const calc_parser& other) = delete;
+
+  /**
+   * Return reference to stream all non-error output is written to.
+   */
+  std::ostream& sink() const noexcept;
 
   /**
    * Parse input from `stdin`.
