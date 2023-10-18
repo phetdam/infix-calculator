@@ -44,7 +44,6 @@ else()
         add_link_options(-fsanitize=address)
     endif()
 endif()
-# determine if building static or shared library
 # use raw instead of STL unique_ptr as the PIMPL class pointer
 if(PDCALC_RAW_PIMPL)
     message(STATUS "PIMPL: raw pointer")
