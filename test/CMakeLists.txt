@@ -19,12 +19,14 @@ if(WIN32)
             /wd5026
     )
     # need to copy dependent DLLs to build directory on Win32
-    add_custom_command(
-        TARGET pdcalc_test POST_BUILD
-        COMMAND
-            ${CMAKE_COMMAND} -E copy_if_different
-                $<TARGET_RUNTIME_DLLS:pdcalc_test>
-                $<TARGET_FILE_DIR:pdcalc_test>
-        COMMAND_EXPAND_LISTS
-    )
+    if(BUILD_SHARED_LIBS)
+        add_custom_command(
+            TARGET pdcalc_test POST_BUILD
+            COMMAND
+                ${CMAKE_COMMAND} -E copy_if_different
+                    $<TARGET_RUNTIME_DLLS:pdcalc_test>
+                    $<TARGET_FILE_DIR:pdcalc_test>
+            COMMAND_EXPAND_LISTS
+        )
+    endif()
 endif()

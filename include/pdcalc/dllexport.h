@@ -8,16 +8,24 @@
 #ifndef PDCALC_DLLEXPORT_H_
 #define PDCALC_DLLEXPORT_H_
 
-#ifdef _WIN32
-// all DLLs should be built with PDCALC_BUILD_DLL defined
-#ifdef PDCALC_BUILD_DLL
-// use to handle import/export automatically
+// building pdcalc shared
+#if defined(PDCALC_DLL)
+// Windows
+#if defined(_WIN32)
+// export if building DLL, import otherwise
+#if defined(PDCALC_BUILD_DLL)
 #define PDCALC_API __declspec(dllexport)
 #else
 #define PDCALC_API __declspec(dllimport)
-#endif  // PDCALC_BUILD_DLL
+#endif  // !defined(PDCALC_BUILD_DLL)
+#else
+// for GCC/Clang, can define as __attribute__((visibility("default"))) if using
+// -fvisibility=hidden later on to explicitly mark exported symbols
+#define PDCALC_API
+#endif  // !defined(_WIN32)
+// build pdcalc static
 #else
 #define PDCALC_API
-#endif  // _WIN32
+#endif  // !defined(PDCALC_DLL)
 
 #endif  // PDCALC_DLLEXPORT_H_
