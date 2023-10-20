@@ -17,10 +17,8 @@ Can process semicolon-terminated expression input from both stdin and text
 files. Supports boolean, integral, and floating point expressions using standard
 arithmetic and logical operations, with C-style operator precedence. Allows line
 comments within input files and grouping of subexpressions with parentheses.
-
 Some simple builtin functions are available, e.g. trigonometric functions,
-binary min + max functions. Maybe someday I will be able to support name
-assignment.
+binary min + max functions.
 
 The calculator parser is built as a separate static or shared library that the
 calculator command-line tool links against. PIMPL is used to provide a stable
