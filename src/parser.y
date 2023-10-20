@@ -159,106 +159,337 @@ input:
 /* Statement rule */
 stmt:
   ";"
-| i_expr ";"    { driver.sink() << "<long> " << $1 << std::endl; }
-| d_expr ";"    { driver.sink() << "<double> " << $1 << std::endl; }
-| b_expr ";"    { PDCALC_YY_PRINT_BOOL($1); }
+| i_expr ";"
+  {
+    driver.sink() << "<long> " << $1 << std::endl;
+  }
+| d_expr ";"
+  {
+    driver.sink() << "<double> " << $1 << std::endl;
+  }
+| b_expr ";"
+  {
+    PDCALC_YY_PRINT_BOOL($1);
+  }
 
 /* Integral expression rule */
 i_expr:
-  INTEGRAL              { $$ = $1; }
-| "(" i_expr ")"        { $$ = $2; }
-| i_expr "+" i_expr     { $$ = $1 + $3; }
-| i_expr "-" i_expr     { $$ = $1 - $3; }
-| i_expr "*" i_expr     { $$ = $1 * $3; }
-| i_expr "/" i_expr     { PDCALC_YY_SAFE_DIVIDE($$, $1, $3); }
-| i_expr "%" i_expr     { $$ = $1 % $3; }
-| i_expr "&" i_expr     { $$ = $1 & $3; }
-| i_expr "^" i_expr     { $$ = $1 ^ $3; }
-| i_expr "|" i_expr     { $$ = $1 | $3; }
-| "~" i_expr            { $$ = ~$2; }
-| i_expr "<<" i_expr    { $$ = $1 << $3; }
-| i_expr ">>" i_expr    { $$ = $1 >> $3; }
+  INTEGRAL
+  {
+    $$ = $1;
+  }
+| "(" i_expr ")"
+  {
+    $$ = $2;
+  }
+| i_expr "+" i_expr
+  {
+    $$ = $1 + $3;
+  }
+| i_expr "-" i_expr
+  {
+    $$ = $1 - $3;
+  }
+| i_expr "*" i_expr
+  {
+    $$ = $1 * $3;
+  }
+| i_expr "/" i_expr
+  {
+    PDCALC_YY_SAFE_DIVIDE($$, $1, $3);
+  }
+| i_expr "%" i_expr
+  {
+    $$ = $1 % $3;
+  }
+| i_expr "&" i_expr
+  {
+    $$ = $1 & $3;
+  }
+| i_expr "^" i_expr
+  {
+    $$ = $1 ^ $3;
+  }
+| i_expr "|" i_expr
+  {
+    $$ = $1 | $3;
+  }
+| "~" i_expr
+  {
+    $$ = ~$2;
+  }
+| i_expr "<<" i_expr
+  {
+    $$ = $1 << $3;
+  }
+| i_expr ">>" i_expr
+  {
+    $$ = $1 >> $3;
+  }
 /* Binary function calls */
-| "max" "(" i_expr "," i_expr ")"    { $$ = std::max($3, $5); }
-| "min" "(" i_expr "," i_expr ")"    { $$ = std::min($3, $5); }
+| "max" "(" i_expr "," i_expr ")"
+  {
+    $$ = std::max($3, $5);
+  }
+| "min" "(" i_expr "," i_expr ")"
+  {
+    $$ = std::min($3, $5);
+  }
 
 /* Float arithmetic expression rule */
 d_expr:
-  FLOATING             { $$ = $1; }
-| "(" d_expr ")"       { $$ = $2; }
-| d_expr "+" d_expr    { $$ = $1 + $3; }
-| d_expr "-" d_expr    { $$ = $1 - $3; }
-| d_expr "*" d_expr    { $$ = $1 * $3; }
-| d_expr "/" d_expr    { PDCALC_YY_SAFE_DIVIDE($$, $1, $3); }
+  FLOATING
+  {
+    $$ = $1;
+  }
+| "(" d_expr ")"
+  {
+    $$ = $2;
+  }
+| d_expr "+" d_expr
+  {
+    $$ = $1 + $3;
+  }
+| d_expr "-" d_expr
+  {
+    $$ = $1 - $3;
+  }
+| d_expr "*" d_expr
+  {
+    $$ = $1 * $3;
+  }
+| d_expr "/" d_expr
+  {
+    PDCALC_YY_SAFE_DIVIDE($$, $1, $3);
+  }
 /* promoting right i_expr */
-| d_expr "+" i_expr    { $$ = $1 + $3; }
-| d_expr "-" i_expr    { $$ = $1 - $3; }
-| d_expr "*" i_expr    { $$ = $1 * $3; }
-| d_expr "/" i_expr    { PDCALC_YY_SAFE_DIVIDE($$, $1, $3); }
+| d_expr "+" i_expr
+  {
+    $$ = $1 + $3;
+  }
+| d_expr "-" i_expr
+  {
+    $$ = $1 - $3;
+  }
+| d_expr "*" i_expr
+  {
+    $$ = $1 * $3;
+  }
+| d_expr "/" i_expr
+  {
+    PDCALC_YY_SAFE_DIVIDE($$, $1, $3);
+  }
 /* promoting left i_expr */
-| i_expr "+" d_expr    { $$ = $1 + $3; }
-| i_expr "-" d_expr    { $$ = $1 - $3; }
-| i_expr "*" d_expr    { $$ = $1 * $3; }
-| i_expr "/" d_expr    { PDCALC_YY_SAFE_DIVIDE($$, $1, $3); }
+| i_expr "+" d_expr
+  {
+    $$ = $1 + $3;
+  }
+| i_expr "-" d_expr
+  {
+    $$ = $1 - $3;
+  }
+| i_expr "*" d_expr
+  {
+    $$ = $1 * $3;
+  }
+| i_expr "/" d_expr
+  {
+    PDCALC_YY_SAFE_DIVIDE($$, $1, $3);
+  }
 /* Unary function calls */
-| "sqrt" "(" d_expr ")"    { $$ = std::sqrt($3); }
-| "sqrt" "(" i_expr ")"    { $$ = std::sqrt($3); }
-| "sin" "(" d_expr ")"     { $$ = std::sin($3); }
-| "sin" "(" i_expr ")"     { $$ = std::sin($3); }
-| "cos" "(" d_expr ")"     { $$ = std::cos($3); }
-| "cos" "(" i_expr ")"     { $$ = std::cos($3); }
-| "tan" "(" d_expr ")"     { $$ = std::tan($3); }
-| "tan" "(" i_expr ")"     { $$ = std::tan($3); }
+| "sqrt" "(" d_expr ")"
+  {
+    $$ = std::sqrt($3);
+  }
+| "sqrt" "(" i_expr ")"
+  {
+    $$ = std::sqrt($3);
+  }
+| "sin" "(" d_expr ")"
+  {
+    $$ = std::sin($3);
+  }
+| "sin" "(" i_expr ")"
+  {
+    $$ = std::sin($3);
+  }
+| "cos" "(" d_expr ")"
+  {
+    $$ = std::cos($3);
+  }
+| "cos" "(" i_expr ")"
+  {
+    $$ = std::cos($3);
+  }
+| "tan" "(" d_expr ")"
+  {
+    $$ = std::tan($3);
+  }
+| "tan" "(" i_expr ")"
+  {
+    $$ = std::tan($3);
+  }
 /*
  * Binary function calls.
  *
  * Note that in some cases, explicit template type is specified since the min +
  * max templates have a (const T& a, const T& b) signature.
  */
-| "max" "(" d_expr "," d_expr ")"    { $$ = std::max($3, $5); }
-| "max" "(" d_expr "," i_expr ")"    { $$ = std::max<double>($3, $5); }
-| "max" "(" i_expr "," d_expr ")"    { $$ = std::max<double>($3, $5); }
-| "min" "(" d_expr "," d_expr ")"    { $$ = std::min($3, $5); }
-| "min" "(" d_expr "," i_expr ")"    { $$ = std::min<double>($3, $5); }
-| "min" "(" i_expr "," d_expr ")"    { $$ = std::min<double>($3, $5); }
+| "max" "(" d_expr "," d_expr ")"
+  {
+    $$ = std::max($3, $5);
+  }
+| "max" "(" d_expr "," i_expr ")"
+  {
+    $$ = std::max<double>($3, $5);
+  }
+| "max" "(" i_expr "," d_expr ")"
+  {
+    $$ = std::max<double>($3, $5);
+  }
+| "min" "(" d_expr "," d_expr ")"
+  {
+    $$ = std::min($3, $5);
+  }
+| "min" "(" d_expr "," i_expr ")"
+  {
+    $$ = std::min<double>($3, $5);
+  }
+| "min" "(" i_expr "," d_expr ")"
+  {
+    $$ = std::min<double>($3, $5);
+  }
 
 /* Boolean expression rule */
 b_expr:
-  TRUTH                 { $$ = $1; }
-| "(" b_expr ")"        { $$ = $2; }
+  TRUTH
+  {
+    $$ = $1;
+  }
+| "(" b_expr ")"
+  {
+    $$ = $2;
+  }
 /* b_expr comparisons */
-| b_expr "==" b_expr    { $$ = ($1 == $3); }
-| b_expr "!=" b_expr    { $$ = ($1 == $3); }
-| b_expr "||" b_expr    { $$ = ($1 || $3); }
-| b_expr "&&" b_expr    { $$ = ($1 && $3); }
-| "!" b_expr            { $$ = !$2; }
+| b_expr "==" b_expr
+  {
+    $$ = ($1 == $3);
+  }
+| b_expr "!=" b_expr
+  {
+    $$ = ($1 == $3);
+  }
+| b_expr "||" b_expr
+  {
+    $$ = ($1 || $3);
+  }
+| b_expr "&&" b_expr
+  {
+    $$ = ($1 && $3);
+  }
+| "!" b_expr
+  {
+    $$ = !$2;
+  }
 /* d_expr, i_expr comparisons */
-| d_expr "==" d_expr    { $$ = ($1 == $3); }
-| d_expr "!=" d_expr    { $$ = ($1 != $3); }
-| i_expr "==" i_expr    { $$ = ($1 == $3); }
-| i_expr "!=" i_expr    { $$ = ($1 != $3); }
-| d_expr "<" d_expr     { $$ = ($1 < $3); }
-| d_expr ">" d_expr     { $$ = ($1 > $3); }
-| d_expr "<=" d_expr    { $$ = ($1 <= $3); }
-| d_expr ">=" d_expr    { $$ = ($1 >= $3); }
-| i_expr "<" i_expr     { $$ = ($1 < $3); }
-| i_expr ">" i_expr     { $$ = ($1 > $3); }
-| i_expr "<=" i_expr    { $$ = ($1 <= $3); }
-| i_expr ">=" i_expr    { $$ = ($1 >= $3); }
+| d_expr "==" d_expr
+  {
+    $$ = ($1 == $3);
+  }
+| d_expr "!=" d_expr
+  {
+    $$ = ($1 != $3);
+  }
+| i_expr "==" i_expr
+  {
+    $$ = ($1 == $3);
+  }
+| i_expr "!=" i_expr
+  {
+    $$ = ($1 != $3);
+  }
+| d_expr "<" d_expr
+  {
+    $$ = ($1 < $3);
+  }
+| d_expr ">" d_expr
+  {
+    $$ = ($1 > $3);
+  }
+| d_expr "<=" d_expr
+  {
+    $$ = ($1 <= $3);
+  }
+| d_expr ">=" d_expr
+  {
+    $$ = ($1 >= $3);
+  }
+| i_expr "<" i_expr
+  {
+    $$ = ($1 < $3);
+  }
+| i_expr ">" i_expr
+  {
+    $$ = ($1 > $3);
+  }
+| i_expr "<=" i_expr
+  {
+    $$ = ($1 <= $3);
+  }
+| i_expr ">=" i_expr
+  {
+    $$ = ($1 >= $3);
+  }
 /* d_expr left, i_expr right */
-| d_expr "==" i_expr    { $$ = ($1 == $3); }
-| d_expr "!=" i_expr    { $$ = ($1 != $3); }
-| d_expr "<" i_expr     { $$ = ($1 < $3); }
-| d_expr ">" i_expr     { $$ = ($1 > $3); }
-| d_expr "<=" i_expr    { $$ = ($1 <= $3); }
-| d_expr ">=" i_expr    { $$ = ($1 >= $3); }
+| d_expr "==" i_expr
+  {
+    $$ = ($1 == $3);
+  }
+| d_expr "!=" i_expr
+  {
+    $$ = ($1 != $3);
+  }
+| d_expr "<" i_expr
+  {
+    $$ = ($1 < $3);
+  }
+| d_expr ">" i_expr
+  {
+    $$ = ($1 > $3);
+  }
+| d_expr "<=" i_expr
+  {
+    $$ = ($1 <= $3);
+  }
+| d_expr ">=" i_expr
+  {
+    $$ = ($1 >= $3);
+  }
 /* i_expr left, d_expr right */
-| i_expr "==" d_expr    { $$ = ($1 == $3); }
-| i_expr "!=" d_expr    { $$ = ($1 != $3); }
-| i_expr "<" d_expr     { $$ = ($1 < $3); }
-| i_expr ">" d_expr     { $$ = ($1 > $3); }
-| i_expr "<=" d_expr    { $$ = ($1 <= $3); }
-| i_expr ">=" d_expr    { $$ = ($1 >= $3); }
+| i_expr "==" d_expr
+  {
+    $$ = ($1 == $3);
+  }
+| i_expr "!=" d_expr
+  {
+    $$ = ($1 != $3);
+  }
+| i_expr "<" d_expr
+  {
+    $$ = ($1 < $3);
+  }
+| i_expr ">" d_expr
+  {
+    $$ = ($1 > $3);
+  }
+| i_expr "<=" d_expr
+  {
+    $$ = ($1 <= $3);
+  }
+| i_expr ">=" d_expr
+  {
+    $$ = ($1 >= $3);
+  }
 
 %%
 
