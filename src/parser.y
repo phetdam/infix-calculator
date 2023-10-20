@@ -11,16 +11,16 @@
   // contains macros used for controlling the warning state
   #include "pdcalc/warnings.h"
 
-  // MSVC reports __STDC_WANT_SECURE_LIB__ not defined in limits.h, which it
-  // replaces with an #if 0 for the conditional, so we manually suppress this
-  PDCALC_MSVC_WARNING_PUSH()
-  PDCALC_MSVC_WARNING_DISABLE(4668)
-  #include <ios>
-  #include <iostream>
-  PDCALC_MSVC_WARNING_POP()
+  // MSVC reports __STDC_WANT_SECURE_LIB__ not defined in limits.h, but this is
+  // defined to 1 in corecrt.h, hence the conditional inclusion.
+  #ifdef _WIN32
+  #include <corecrt.h>
+  #endif  // _WIN32
 
   #include <algorithm>
   #include <cmath>
+  #include <ios>
+  #include <iostream>
   #include <sstream>
   #include <string>
 
