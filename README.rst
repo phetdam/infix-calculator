@@ -45,13 +45,13 @@ on Windows. If located in different directories, ``PDCALC_FLEX_DIR`` and
 
 Building is easy with the provided ``build.sh`` build script. For usage, type
 
-.. code:: shell
+.. code:: bash
 
    ./build.sh --help
 
 To build release binaries for this project, simply use the command
 
-.. code:: shell
+.. code:: bash
 
    ./build.sh -c Release
 
