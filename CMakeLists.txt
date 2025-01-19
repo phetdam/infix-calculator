@@ -111,6 +111,7 @@ set(PDCALC_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # path to test data directory
 set(PDCALC_TEST_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/data)
 
+include(CMakePackageConfigHelpers)
 include(CTest)
 
 # relative include for the version header + extra helper
@@ -162,3 +163,26 @@ if(GTest_FOUND)
 else()
     message(STATUS "Skipping tests as Google Test ${GTest_VERSION} was not found")
 endif()
+
+# configure package config file
+# note: won't change across build configs so we just put in top-level
+set(PDCALC_CONFIG_FILE pdcalc-config.cmake)
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PDCALC_CONFIG_FILE}.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PDCALC_CONFIG_FILE}
+    INSTALL_DESTINATION cmake/pdcalc
+)
+# configure version selection file
+set(PDCALC_CONFIG_VERSION_FILE pdcalc-config-version.cmake)
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/${PDCALC_CONFIG_VERSION_FILE}
+    VERSION ${PDCALC_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+# install rule for the config and version config files
+install(
+    FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/${PDCALC_CONFIG_FILE}
+        ${CMAKE_CURRENT_BINARY_DIR}/${PDCALC_CONFIG_VERSION_FILE}
+    DESTINATION lib/cmake/pdcalc
+)

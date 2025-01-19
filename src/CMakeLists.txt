@@ -95,6 +95,7 @@ install(TARGETS pdcalc_lib EXPORT pdcalc_lib_export)
 install(
     EXPORT pdcalc_lib_export
     DESTINATION lib/cmake/pdcalc
+    NAMESPACE pdcalc::
     FILE pdcalc-targets.cmake
 )
 # headers install rule. we use this instead of PUBLIC_HEADER target property

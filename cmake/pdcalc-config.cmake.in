@@ -1,0 +1,9 @@
+# pdcalc-config.cmake
+#
+# pdcalc CMake config script
+#
+
+@PACKAGE_INIT@
+
+# export pdcalc targets
+include(${CMAKE_CURRENT_LIST_DIR}/pdcalc-targets.cmake)
