@@ -65,8 +65,12 @@ add_library(
 )
 set_target_properties(
     pdcalc_lib PROPERTIES
-        OUTPUT_NAME pdcalc
-        DEFINE_SYMBOL PDCALC_BUILD_DLL
+    # both exported target name and output file are just pdcalc
+    EXPORT_NAME pdcalc
+    OUTPUT_NAME pdcalc
+    DEFINE_SYMBOL PDCALC_BUILD_DLL
+    # add "d" suffix for debug libraries
+    DEBUG_POSTFIX d
 )
 # when building shared PDCALC_DLL is part of the compile interface
 if(BUILD_SHARED_LIBS)
@@ -86,8 +90,31 @@ target_include_directories(
 if(PDCALC_IS_MULTI_CONFIG)
     add_dependencies(pdcalc_lib pdcalc_version_h)
 endif()
+# installation rule + export installation rule
+install(TARGETS pdcalc_lib EXPORT pdcalc_lib_export)
+install(
+    EXPORT pdcalc_lib_export
+    DESTINATION lib/cmake/pdcalc
+    FILE pdcalc-targets.cmake
+)
+# headers install rule. we use this instead of PUBLIC_HEADER target property
+# because the version.h will be selected via generator expression
+# FIXME: we can use PUBLIC_HEADER later when the per-config info is split into
+# a private config.hh generated header file
+install(
+    FILES
+        ${PDCALC_INCLUDE_DIR}/pdcalc/calc_parser.h
+        ${PDCALC_INCLUDE_DIR}/pdcalc/common.h
+        ${PDCALC_INCLUDE_DIR}/pdcalc/dllexport.h
+        ${PDCALC_INCLUDE_DIR}/pdcalc/features.h
+        ${PDCALC_BINARY_DIR}/$<${PDCALC_IS_MULTI_CONFIG}:$<CONFIG>>/${PDCALC_VERSION_H}
+        ${PDCALC_INCLUDE_DIR}/pdcalc/warnings.h
+    DESTINATION include/pdcalc
+)
 
 # pdcalc CLI frontend
 add_executable(pdcalc_bin main.cc)
 target_link_libraries(pdcalc_bin PRIVATE pdcalc_lib)
 set_target_properties(pdcalc_bin PROPERTIES OUTPUT_NAME pdcalc)
+# installation rule
+install(TARGETS pdcalc_bin)

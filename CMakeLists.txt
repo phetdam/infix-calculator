@@ -62,11 +62,14 @@ else()
     message(STATUS "PIMPL method: unique_ptr")
 endif()
 
+# current top-level build directory
+set(PDCALC_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+
 # build all artifacts in top-level build directory. multi-config generators
 # like Visual Studio will have a per-config subdirectory
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PDCALC_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PDCALC_BINARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PDCALC_BINARY_DIR})
 
 # enforce our C/C++ standards
 set(CMAKE_C_STANDARD 11)
@@ -110,16 +113,17 @@ set(PDCALC_TEST_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/data)
 
 include(CTest)
 
-# relative include for the version header
-set(_version_include include/pdcalc/version.h)
+# relative include for the version header + extra helper
+set(PDCALC_VERSION_H include/pdcalc/version.h)
 # generate version header. for multi-config, need a pre-build command
+# FIXME: this will be repurposed for config.hh which is per-config and internal
 if(PDCALC_IS_MULTI_CONFIG)
     add_custom_target(
         pdcalc_version_h
         COMMAND
             ${CMAKE_COMMAND}
-                -DPDCALC_VERSION_H_IN=${CMAKE_CURRENT_SOURCE_DIR}/${_version_include}.in
-                -DPDCALC_VERSION_H=${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/${_version_include}
+                -DPDCALC_VERSION_H_IN=${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_VERSION_H}.in
+                -DPDCALC_VERSION_H=${PDCALC_BINARY_DIR}/$<CONFIG>/${PDCALC_VERSION_H}
                 -DPDCALC_MAJOR_VERSION=${PDCALC_MAJOR_VERSION}
                 -DPDCALC_MINOR_VERSION=${PDCALC_MINOR_VERSION}
                 -DPDCALC_PATCH_VERSION=${PDCALC_PATCH_VERSION}
@@ -129,26 +133,25 @@ if(PDCALC_IS_MULTI_CONFIG)
                 -DPDCALC_SYSTEM_VERSION=${PDCALC_SYSTEM_VERSION}
                 -DPDCALC_SYSTEM_ARCH=${PDCALC_SYSTEM_ARCH}
                 -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/pdcalc_config_version.cmake
-        BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/${_version_include}
-        COMMENT "Generating $<CONFIG> ${_version_include}"
+        BYPRODUCTS ${PDCALC_BINARY_DIR}/$<CONFIG>/${PDCALC_VERSION_H}
+        COMMENT "Generating $<CONFIG> ${PDCALC_VERSION_H}"
         VERBATIM
-        SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/${_version_include}.in
+        SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_VERSION_H}.in
     )
 # otherwise, a standard configure_file is enough
 else()
     configure_file(
-        ${_version_include}.in ${_version_include}
+        ${PDCALC_VERSION_H}.in ${PDCALC_VERSION_H}
         @ONLY NEWLINE_STYLE LF
     )
-    message(STATUS "Generated ${_version_include}")
+    message(STATUS "Generated ${PDCALC_VERSION_H}")
 endif()
-unset(_version_include)
 
 # build-private include dirs. for multi-config there is per-config subdir
 if(PDCALC_IS_MULTI_CONFIG)
-    include_directories(${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/include)
+    include_directories(${PDCALC_BINARY_DIR}/$<CONFIG>/include)
 else()
-    include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
+    include_directories(${PDCALC_BINARY_DIR}/include)
 endif()
 
 # add src, add test only if Google Test is found
