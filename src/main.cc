@@ -34,7 +34,7 @@ const std::string program_version_info{
   pdcalc::system_version + ")"
 };
 const std::string program_usage{
-  "Usage: " + progname + " [-h] [FILE...] [-t[l[p]]]\n"
+  "Usage: " + progname + " [-h] [-t[l[p]]] [FILE...]\n"
   "\n"
   "A statement-based infix calculator.\n"
   "\n"
