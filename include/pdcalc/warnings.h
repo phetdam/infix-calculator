@@ -15,7 +15,7 @@
 #define PDCALC_PRAGMA(x) PDCALC_PRAGMA_I(x)
 
 // helper macros for disabling and re-enabling MSVC warnings
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 /**
  * Push warning state.
  */
@@ -36,10 +36,10 @@
 #define PDCALC_MSVC_WARNING_PUSH()
 #define PDCALC_MSVC_WARNING_DISABLE(wnos)
 #define PDCALC_MSVC_WARNING_POP()
-#endif  // _MSC_VER
+#endif  // !defined(_MSC_VER)
 
 // helper macros for disabling and re-enabling GCC/Clang warnings
-#ifdef __GNUC__
+#if defined(__GNUC__)
 /**
  * Push warning state.
  */
@@ -61,11 +61,11 @@
 #define PDCALC_GNU_WARNING_PUSH()
 #define PDCALC_GNU_WARNING_DISABLE(wname)
 #define PDCALC_GNU_WARNING_POP()
-#endif  // __GNUC__
+#endif  // !defined(__GNUC__)
 
 // helper macros for disabling and re-enabling Clang warnings. these are useful
 // when there are Clang-specific warnings that have no GCC equivalent.
-#ifdef __clang__
+#if defined(__clang__)
 /**
  * Push warning state.
  */
@@ -87,6 +87,6 @@
 #define PDCALC_CLANG_WARNING_PUSH()
 #define PDCALC_CLANG_WARNING_DISABLE(wname)
 #define PDCALC_CLANG_WARNING_POP()
-#endif  // __clang__
+#endif  // !defined(__clang__)
 
 #endif  // PDCALC_WARNINGS_H_
