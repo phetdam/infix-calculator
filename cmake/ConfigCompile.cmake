@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION ${CMAKE_MINIMUM_REQUIRED_VERSION})
 #
 
 # if building shared libraries, define PDCALC_DLL
+# FIXME: should only be applied to the pdcalc_lib target
 if(BUILD_SHARED_LIBS)
     add_compile_definitions(PDCALC_DLL)
 endif()
@@ -45,6 +46,7 @@ else()
     endif()
 endif()
 # use raw instead of STL unique_ptr as the PIMPL class pointer
+# FIXME: should only be applied to the pdcalc_lib target
 if(PDCALC_RAW_PIMPL)
     message(STATUS "PIMPL: raw pointer")
     add_compile_definitions(PDCALC_RAW_PIMPL)
