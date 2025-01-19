@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "pdcalc/calc_parser.h"
+#include "pdcalc/string.hh"  // for operator+ for string and string view
 #include "pdcalc/version.h"
 
 namespace {

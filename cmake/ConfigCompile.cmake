@@ -23,6 +23,8 @@ if(MSVC)
         /wd4514
         # assignment + move assignment operator implicitly defined as deleted
         /wd4626 /wd5027
+        # function not inlined + function selected for inline expansion
+        /wd4710 /wd4711
         # silence warning about padding
         /wd4820
         # insertion of Spectre mitigation if using /QSpectre

@@ -54,6 +54,7 @@ if(MSVC)
         COMPILE_OPTIONS "/wd4127;/wd4365"
     )
 endif()
+
 # pdcalc library implementing parser
 add_library(
     pdcalc_lib
@@ -73,6 +74,11 @@ target_include_directories(
     $<BUILD_INTERFACE:${PDCALC_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:include>
 )
+# for multi-config generators version header generation is a pre-build step
+if(PDCALC_IS_MULTI_CONFIG)
+    add_dependencies(pdcalc_lib pdcalc_version_h)
+endif()
+
 # pdcalc CLI frontend
 add_executable(pdcalc_bin main.cc)
 target_link_libraries(pdcalc_bin PRIVATE pdcalc_lib)

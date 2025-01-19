@@ -18,18 +18,9 @@ cmake_minimum_required(VERSION 3.16)
 #   cmake -S . -B build && cmake --build build -j
 #
 
-# major, minor, patch versions + version string
-set(PDCALC_MAJOR_VERSION 0)
-set(PDCALC_MINOR_VERSION 1)
-set(PDCALC_PATCH_VERSION 0)
-set(
-    PDCALC_VERSION
-    ${PDCALC_MAJOR_VERSION}.${PDCALC_MINOR_VERSION}.${PDCALC_PATCH_VERSION}
-)
-
 project(
     pdcalc
-    VERSION ${PDCALC_VERSION}
+    VERSION 0.1.0
     DESCRIPTION "An infix calculator written with Flex + Bison"
     HOMEPAGE_URL https://github.com/phetdam/infix-calculator
     LANGUAGES C CXX
@@ -71,11 +62,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-# set some system information variables used for the version info
-set(PDCALC_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
-set(PDCALC_SYSTEM_VERSION ${CMAKE_SYSTEM_VERSION})
-set(PDCALC_SYSTEM_ARCH ${CMAKE_SYSTEM_PROCESSOR})
-
 # enforce our C/C++ standards
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
@@ -97,6 +83,15 @@ endif()
 
 # set compiler options
 include(ConfigCompile)
+
+# set some variables used for the version info
+set(PDCALC_MAJOR_VERSION ${PROJECT_VERSION_MAJOR})
+set(PDCALC_MINOR_VERSION ${PROJECT_VERSION_MINOR})
+set(PDCALC_PATCH_VERSION ${PROJECT_VERSION_PATCH})
+set(PDCALC_VERSION ${PROJECT_VERSION})
+set(PDCALC_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
+set(PDCALC_SYSTEM_VERSION ${CMAKE_SYSTEM_VERSION})
+set(PDCALC_SYSTEM_ARCH ${CMAKE_SYSTEM_PROCESSOR})
 
 # macro definitions for versioning
 # FIXME: don't use after version header generation is fixed
@@ -120,6 +115,47 @@ set(PDCALC_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(PDCALC_TEST_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/data)
 
 include(CTest)
+
+# relative include for the version header
+set(_version_include include/pdcalc/version.h)
+# generate version header. for multi-config, need a pre-build command
+if(PDCALC_IS_MULTI_CONFIG)
+    add_custom_target(
+        pdcalc_version_h
+        COMMAND
+            ${CMAKE_COMMAND}
+                -DPDCALC_VERSION_H_IN=${CMAKE_CURRENT_SOURCE_DIR}/${_version_include}.in
+                -DPDCALC_VERSION_H=${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/${_version_include}
+                -DPDCALC_MAJOR_VERSION=${PDCALC_MAJOR_VERSION}
+                -DPDCALC_MINOR_VERSION=${PDCALC_MINOR_VERSION}
+                -DPDCALC_PATCH_VERSION=${PDCALC_PATCH_VERSION}
+                -DPDCALC_VERSION=${PDCALC_VERSION}
+                -DPDCALC_BUILD_TYPE=$<CONFIG>
+                -DPDCALC_SYSTEM_NAME=${PDCALC_SYSTEM_NAME}
+                -DPDCALC_SYSTEM_VERSION=${PDCALC_SYSTEM_VERSION}
+                -DPDCALC_SYSTEM_ARCH=${PDCALC_SYSTEM_ARCH}
+                -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/pdcalc_config_version.cmake
+        BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/${_version_include}
+        COMMENT "Generating $<CONFIG> ${_version_include}"
+        VERBATIM
+        SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/${_version_include}.in
+    )
+# otherwise, a standard configure_file is enough
+else()
+    message(STATUS "Generating ${_version_include}")
+    configure_file(
+        ${_version_include}.in ${_version_include}
+        @ONLY NEWLINE_STYLE LF
+    )
+endif()
+unset(_version_include)
+
+# build-private include dirs. for multi-config there is per-config subdir
+if(PDCALC_IS_MULTI_CONFIG)
+    include_directories(${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/include)
+else()
+    include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
+endif()
 
 # add src, add test only if Google Test is found
 add_subdirectory(src)
