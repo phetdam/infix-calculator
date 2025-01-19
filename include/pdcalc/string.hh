@@ -8,17 +8,17 @@
 #ifndef PDCALC_STRING_HH_
 #define PDCALC_STRING_HH_
 
-#include "pdcalc/features.h"  // for PDCALC_HAS_CC_26
+#include "pdcalc/features.h"  // for PDCALC_HAS_CC26
 
-#if !PDCALC_HAS_CC_26
+#if !PDCALC_HAS_CC26
 #include <string>
 #include <string_view>
 
 #include "pdcalc/common.h"
 #include "pdcalc/type_traits.hh"
-#endif  // !PDCALC_HAS_CC_26
+#endif  // !PDCALC_HAS_CC26
 
-#if !PDCALC_HAS_CC_26
+#if !PDCALC_HAS_CC26
 
 // for ADL to work these operators are defined in std::
 namespace std {
@@ -35,7 +35,7 @@ namespace std {
  * @param rhs String view (non-deduced)
  */
 template <typename CharT, typename Traits, typename Alloc>
-PDCALC_CXX20_CONSTEXPR auto operator+(
+PDCALC_CC20_CONSTEXPR auto operator+(
   const basic_string<CharT, Traits, Alloc>& lhs,
   pdcalc::type_identity_t<basic_string_view<CharT, Traits>> rhs)
 {
@@ -57,7 +57,7 @@ PDCALC_CXX20_CONSTEXPR auto operator+(
  * @param rhs String
  */
 template <typename CharT, typename Traits, typename Alloc>
-PDCALC_CXX20_CONSTEXPR auto operator+(
+PDCALC_CC20_CONSTEXPR auto operator+(
   pdcalc::type_identity_t<basic_string_view<CharT, Traits>> lhs,
   const basic_string<CharT, Traits, Alloc>& rhs)
 {
@@ -66,6 +66,6 @@ PDCALC_CXX20_CONSTEXPR auto operator+(
 
 }  // namespace std
 
-#endif  // !PDCALC_HAS_CC_26
+#endif  // !PDCALC_HAS_CC26
 
 #endif  // PDCALC_STRING_HH_

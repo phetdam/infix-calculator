@@ -8,11 +8,11 @@
 #ifndef PDCALC_VERSION_H_
 #define PDCALC_VERSION_H_
 
-#include "pdcalc/features.h"  // for PDCALC_HAS_CC_17
+#include "pdcalc/features.h"  // for PDCALC_HAS_CC17
 
-#if PDCALC_HAS_CC_17
+#if PDCALC_HAS_CC17
 #include <string_view>
-#endif  // PDCALC_HAS_CC_17
+#endif  // PDCALC_HAS_CC17
 
 /**
  * Project major version.
@@ -34,7 +34,7 @@
  */
 #define PDCALC_VERSION "@PDCALC_VERSION@"
 
-#if PDCALC_HAS_CC_17
+#if PDCALC_HAS_CC17
 namespace pdcalc {
 
 /**
@@ -43,14 +43,14 @@ namespace pdcalc {
 inline constexpr std::string_view version{PDCALC_VERSION};
 
 }  // namespace pdcalc
-#endif  // PDCALC_HAS_CC_17
+#endif  // PDCALC_HAS_CC17
 
 /**
  * Project build type.
  */
 #define PDCALC_BUILD_TYPE "@PDCALC_BUILD_TYPE@"
 
-#if PDCALC_HAS_CC_17
+#if PDCALC_HAS_CC17
 namespace pdcalc {
 
 /*
@@ -58,7 +58,7 @@ namespace pdcalc {
  */
 inline constexpr std::string_view build_type{PDCALC_BUILD_TYPE};
 }  // namespace pdcalc
-#endif  // PDCALC_HAS_CC_17
+#endif  // PDCALC_HAS_CC17
 
 /**
  * Target platform system name.
@@ -75,7 +75,7 @@ inline constexpr std::string_view build_type{PDCALC_BUILD_TYPE};
  */
 #define PDCALC_SYSTEM_ARCH "@PDCALC_SYSTEM_ARCH@"
 
-#if PDCALC_HAS_CC_17
+#if PDCALC_HAS_CC17
 namespace pdcalc {
 
 /*
@@ -94,6 +94,6 @@ inline constexpr std::string_view system_version{PDCALC_SYSTEM_VERSION};
 inline constexpr std::string_view system_arch{PDCALC_SYSTEM_ARCH};
 
 }  // namespace pdcalc
-#endif  // PDCALC_HAS_CC_17
+#endif  // PDCALC_HAS_CC17
 
 #endif  // PDCALC_VERSION_H_
