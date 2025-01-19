@@ -110,9 +110,8 @@ add_compile_definitions(
     PDCALC_SYSTEM_VERSION="${PDCALC_SYSTEM_VERSION}"
     PDCALC_SYSTEM_ARCH="${PDCALC_SYSTEM_ARCH}"
 )
-# path to public include directory
+# path to project include directory
 set(PDCALC_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
-include_directories(${PDCALC_INCLUDE_DIR})
 # name of namespaced include directory
 set(PDCALC_NAMESPACE_INCLUDE_DIR ${PDCALC_INCLUDE_DIR}/pdcalc)
 # path to source directory

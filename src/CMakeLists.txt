@@ -67,6 +67,12 @@ set_target_properties(
         OUTPUT_NAME pdcalc
         DEFINE_SYMBOL PDCALC_BUILD_DLL
 )
+# include directories interface changes based on build vs. install
+target_include_directories(
+    pdcalc_lib PUBLIC
+    $<BUILD_INTERFACE:${PDCALC_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:include>
+)
 # pdcalc CLI frontend
 add_executable(pdcalc_bin main.cc)
 target_link_libraries(pdcalc_bin PRIVATE pdcalc_lib)
