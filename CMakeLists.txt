@@ -136,11 +136,11 @@ if(PDCALC_IS_MULTI_CONFIG)
     )
 # otherwise, a standard configure_file is enough
 else()
-    message(STATUS "Generating ${_version_include}")
     configure_file(
         ${_version_include}.in ${_version_include}
         @ONLY NEWLINE_STYLE LF
     )
+    message(STATUS "Generated ${_version_include}")
 endif()
 unset(_version_include)
 
