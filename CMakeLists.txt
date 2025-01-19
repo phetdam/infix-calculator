@@ -30,7 +30,7 @@ project(
 option(BUILD_SHARED_LIBS "Build pdcalc library as shared" ON)
 # use raw pointer instead of unique_ptr for pdcalc parser PIMPL
 option(
-    PDCALC_RAW_IMPL
+    PDCALC_RAW_PIMPL
     "Use raw pointer instead of unique_ptr for parser PIMPL" OFF
 )
 
@@ -50,10 +50,16 @@ endif()
 # single-config generators. this is defined differently for multi-config
 set(PDCALC_BUILD_TYPE ${CMAKE_BUILD_TYPE})
 
+# config messages
 if(BUILD_SHARED_LIBS)
     message(STATUS "Build libraries: Shared")
 else()
     message(STATUS "Build libraries: Static")
+endif()
+if(PDCALC_RAW_PIMPL)
+    message(STATUS "PIMPL method: raw pointer")
+else()
+    message(STATUS "PIMPL method: unique_ptr")
 endif()
 
 # build all artifacts in top-level build directory. multi-config generators
@@ -93,18 +99,6 @@ set(PDCALC_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
 set(PDCALC_SYSTEM_VERSION ${CMAKE_SYSTEM_VERSION})
 set(PDCALC_SYSTEM_ARCH ${CMAKE_SYSTEM_PROCESSOR})
 
-# macro definitions for versioning
-# FIXME: don't use after version header generation is fixed
-add_compile_definitions(
-    PDCALC_MAJOR_VERSION=${PDCALC_MAJOR_VERSION}
-    PDCALC_MINOR_VERSION=${PDCALC_MINOR_VERSION}
-    PDCALC_PATCH_VERSION=${PDCALC_PATCH_VERSION}
-    # need double quotes for CMake to pass as a string
-    PDCALC_BUILD_TYPE="${PDCALC_BUILD_TYPE}"
-    PDCALC_SYSTEM_NAME="${PDCALC_SYSTEM_NAME}"
-    PDCALC_SYSTEM_VERSION="${PDCALC_SYSTEM_VERSION}"
-    PDCALC_SYSTEM_ARCH="${PDCALC_SYSTEM_ARCH}"
-)
 # path to project include directory
 set(PDCALC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # name of namespaced include directory

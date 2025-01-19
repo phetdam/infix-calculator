@@ -68,6 +68,14 @@ set_target_properties(
         OUTPUT_NAME pdcalc
         DEFINE_SYMBOL PDCALC_BUILD_DLL
 )
+# when building shared PDCALC_DLL is part of the compile interface
+if(BUILD_SHARED_LIBS)
+    target_compile_definitions(pdcalc_lib PUBLIC PDCALC_DLL)
+endif()
+# if using raw PIMPL then PDCALC_RAW_PIMPL is part of the compile interface
+if(PDCALC_RAW_PIMPL)
+    target_compile_definitions(pdcalc_lib PUBLIC PDCALC_RAW_PIMPL)
+endif()
 # include directories interface changes based on build vs. install
 target_include_directories(
     pdcalc_lib PUBLIC
