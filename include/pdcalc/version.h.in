@@ -1,7 +1,7 @@
 /**
  * @file version.h
  * @author Derek Huang
- * @brief C++ header for pdcalc versioning
+ * @brief C/C++ header for pdcalc versioning
  * @copyright MIT License
  */
 
