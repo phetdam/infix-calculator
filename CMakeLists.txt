@@ -111,13 +111,13 @@ add_compile_definitions(
     PDCALC_SYSTEM_ARCH="${PDCALC_SYSTEM_ARCH}"
 )
 # path to project include directory
-set(PDCALC_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+set(PDCALC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # name of namespaced include directory
 set(PDCALC_NAMESPACE_INCLUDE_DIR ${PDCALC_INCLUDE_DIR}/pdcalc)
-# path to source directory
-set(PDCALC_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
+# path to source directory (note: currently unused)
+set(PDCALC_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # path to test data directory
-set(PDCALC_TEST_DATA_DIR ${CMAKE_SOURCE_DIR}/data)
+set(PDCALC_TEST_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/data)
 
 include(CTest)
 
