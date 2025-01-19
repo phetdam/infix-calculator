@@ -28,4 +28,15 @@
 #define PDCALC_CPLUSPLUS __cplusplus
 #endif  // !defined(_MSVC_LANG) && !defined(__cplusplus)
 
+// constexpr only if C++20 or above
+#ifdef PDCALC_CPLUSPLUS
+#if PDCALC_CPLUSPLUS >= 202002L
+#define PDCALC_CXX20_CONSTEXPR constexpr
+#endif  // PDCALC_CPLUSPLUS >= 202002L
+#endif  // PDCALC_CPLUSPLUS
+
+#ifndef PDCALC_CXX20_CONSTEXPR
+#define PDCALC_CXX20_CONSTEXPR
+#endif  // PDCALC_CXX20_CONSTEXPR
+
 #endif  // PDCALC_COMMON_H_
