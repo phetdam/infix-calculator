@@ -1,2 +1,5 @@
 # don't include *.in.* files used as pdcalc input in language stats
 *.in.* -linguist-detectable
+# require LF except for batch scripts
+* text=auto
+*.bat text eol=crlf
