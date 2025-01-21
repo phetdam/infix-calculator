@@ -93,7 +93,7 @@ endif()
 # set compiler options
 include(ConfigCompile)
 
-# set some variables used for the version info
+# set some variables used for the version + config info
 set(PDCALC_MAJOR_VERSION ${PROJECT_VERSION_MAJOR})
 set(PDCALC_MINOR_VERSION ${PROJECT_VERSION_MINOR})
 set(PDCALC_PATCH_VERSION ${PROJECT_VERSION_PATCH})
@@ -114,46 +114,48 @@ set(PDCALC_TEST_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/data)
 include(CMakePackageConfigHelpers)
 include(CTest)
 
-# relative include for the version header + extra helper
-set(PDCALC_VERSION_H include/pdcalc/version.h)
+# relative include for the config header
+set(PDCALC_CONFIG_HH include/pdcalc/config.hh)
 # generate version header. for multi-config, need a pre-build command
-# FIXME: this will be repurposed for config.hh which is per-config and internal
 if(PDCALC_IS_MULTI_CONFIG)
     add_custom_target(
-        pdcalc_version_h
+        pdcalc_config_hh
         COMMAND
             ${CMAKE_COMMAND}
-                -DPDCALC_VERSION_H_IN=${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_VERSION_H}.in
-                -DPDCALC_VERSION_H=${PDCALC_BINARY_DIR}/$<CONFIG>/${PDCALC_VERSION_H}
-                -DPDCALC_MAJOR_VERSION=${PDCALC_MAJOR_VERSION}
-                -DPDCALC_MINOR_VERSION=${PDCALC_MINOR_VERSION}
-                -DPDCALC_PATCH_VERSION=${PDCALC_PATCH_VERSION}
-                -DPDCALC_VERSION=${PDCALC_VERSION}
+                -DPDCALC_CONFIG_HH_IN=${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_CONFIG_HH}.in
+                -DPDCALC_CONFIG_HH=${PDCALC_BINARY_DIR}/$<CONFIG>/${PDCALC_CONFIG_HH}
                 -DPDCALC_BUILD_TYPE=$<CONFIG>
                 -DPDCALC_SYSTEM_NAME=${PDCALC_SYSTEM_NAME}
                 -DPDCALC_SYSTEM_VERSION=${PDCALC_SYSTEM_VERSION}
                 -DPDCALC_SYSTEM_ARCH=${PDCALC_SYSTEM_ARCH}
-                -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/pdcalc_config_version.cmake
-        BYPRODUCTS ${PDCALC_BINARY_DIR}/$<CONFIG>/${PDCALC_VERSION_H}
-        COMMENT "Generating $<CONFIG> ${PDCALC_VERSION_H}"
+                -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/pdcalc_generate_config.cmake
+        BYPRODUCTS ${PDCALC_BINARY_DIR}/$<CONFIG>/${PDCALC_CONFIG_HH}
+        COMMENT "Generating $<CONFIG> ${PDCALC_CONFIG_HH}"
         VERBATIM
-        SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_VERSION_H}.in
+        SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_CONFIG_HH}.in
     )
 # otherwise, a standard configure_file is enough
 else()
     configure_file(
-        ${PDCALC_VERSION_H}.in ${PDCALC_VERSION_H}
+        ${PDCALC_CONFIG_HH}.in ${PDCALC_CONFIG_HH}
         @ONLY NEWLINE_STYLE LF
     )
-    message(STATUS "Generated ${PDCALC_VERSION_H}")
+    message(STATUS "Generated ${PDCALC_CONFIG_HH}")
 endif()
 
-# build-private include dirs. for multi-config there is per-config subdir
+# relative include for the version header
+set(PDCALC_VERSION_H include/pdcalc/version.h)
+# configure the public version header file
+configure_file(${PDCALC_VERSION_H}.in ${PDCALC_VERSION_H} @ONLY NEWLINE_STYLE LF)
+message(STATUS "Generated ${PDCALC_VERSION_H}")
+
+# build-private include dirs. for multi-config we add the per-config subdir
+# before the build root include so that the per-config includes have priority
 if(PDCALC_IS_MULTI_CONFIG)
     include_directories(${PDCALC_BINARY_DIR}/$<CONFIG>/include)
-else()
-    include_directories(${PDCALC_BINARY_DIR}/include)
 endif()
+# both single- and multi-config generators may have config-independent includes
+include_directories(${PDCALC_BINARY_DIR}/include)
 
 # add src, add test only if Google Test is found
 add_subdirectory(src)

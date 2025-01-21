@@ -86,31 +86,36 @@ target_include_directories(
     $<BUILD_INTERFACE:${PDCALC_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:include>
 )
-# for multi-config generators version header generation is a pre-build step
+# for multi-config generators config header generation is a pre-build step
 if(PDCALC_IS_MULTI_CONFIG)
-    add_dependencies(pdcalc_lib pdcalc_version_h)
+    add_dependencies(pdcalc_lib pdcalc_config_hh)
 endif()
+# set public headers for pdcalc_lib
+set(
+    PDCALC_PUBLIC_HEADERS
+    ${PDCALC_INCLUDE_DIR}/pdcalc/calc_parser.h
+    ${PDCALC_INCLUDE_DIR}/pdcalc/common.h
+    ${PDCALC_INCLUDE_DIR}/pdcalc/dllexport.h
+    ${PDCALC_INCLUDE_DIR}/pdcalc/features.h
+    ${PDCALC_BINARY_DIR}/${PDCALC_VERSION_H}
+    ${PDCALC_INCLUDE_DIR}/pdcalc/warnings.h
+)
+set_target_properties(
+    pdcalc_lib PROPERTIES
+    # must expand as semicolon-separated string
+    PUBLIC_HEADER "${PDCALC_PUBLIC_HEADERS}"
+)
 # installation rule + export installation rule
-install(TARGETS pdcalc_lib EXPORT pdcalc_lib_export)
+install(
+    TARGETS pdcalc_lib
+    EXPORT pdcalc_lib_export
+    PUBLIC_HEADER DESTINATION include/pdcalc
+)
 install(
     EXPORT pdcalc_lib_export
     DESTINATION lib/cmake/pdcalc
     NAMESPACE pdcalc::
     FILE pdcalc-targets.cmake
-)
-# headers install rule. we use this instead of PUBLIC_HEADER target property
-# because the version.h will be selected via generator expression
-# FIXME: we can use PUBLIC_HEADER later when the per-config info is split into
-# a private config.hh generated header file
-install(
-    FILES
-        ${PDCALC_INCLUDE_DIR}/pdcalc/calc_parser.h
-        ${PDCALC_INCLUDE_DIR}/pdcalc/common.h
-        ${PDCALC_INCLUDE_DIR}/pdcalc/dllexport.h
-        ${PDCALC_INCLUDE_DIR}/pdcalc/features.h
-        ${PDCALC_BINARY_DIR}/$<${PDCALC_IS_MULTI_CONFIG}:$<CONFIG>>/${PDCALC_VERSION_H}
-        ${PDCALC_INCLUDE_DIR}/pdcalc/warnings.h
-    DESTINATION include/pdcalc
 )
 
 # pdcalc CLI frontend
