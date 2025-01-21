@@ -30,3 +30,5 @@ if(WIN32)
         )
     endif()
 endif()
+# make tests known to CTest
+gtest_discover_tests(pdcalc_test)

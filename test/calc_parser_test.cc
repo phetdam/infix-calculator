@@ -11,9 +11,10 @@
 #include <cstring>
 #include <filesystem>
 #include <ostream>
-#include <string_view>
 
 #include <gtest/gtest.h>
+
+#include "pdcalc/common.h"
 
 // test data directory. this default value is defined during compile time but
 // can be overridden by the corresponding environment variable.
@@ -35,14 +36,15 @@ protected:
    */
   static void SetUpTestSuite()
   {
+#define PDCALC_TEST_DATA_DIR_MESSAGE \
+  PDCALC_STRINGIFY_I(PDCALC_TEST_DATA_DIR) " " PDCALC_TEST_DATA_DIR
     // path doesn't exist
     if (!std::filesystem::exists(test_data_dir_))
-      skip_reason_ = "PDCALC_TEST_DATA_DIR " +
-        std::string{PDCALC_TEST_DATA_DIR} + " does not exist";
+      skip_reason_ = PDCALC_TEST_DATA_DIR_MESSAGE " does not exist";
     // not a directory
     else if (!std::filesystem::is_directory(test_data_dir_))
-      skip_reason_ = "PDCALC_TEST_DATA_DIR " +
-        std::string{PDCALC_TEST_DATA_DIR} + " is not a directory";
+      skip_reason_ = PDCALC_TEST_DATA_DIR_MESSAGE " is not a directory";
+#undef PDCALC_TETS_DATA_DIR_MESSAGE
   }
 
   /**
@@ -78,10 +80,19 @@ protected:
 
 /**
  * Calc parser parameterized test fixture.
+ *
+ * @note It has been observed that a Windows build of Google Test 1.10.0 seems
+ *  to have issues properly displaying the `GetParam()` values properly when
+ *  the value type is a string view. For example, instead of having
+ *  `"sample.in.1"` as the reported `GetParam()` value for the first value, we
+ *  get `{ 's' (115, 0x73), 'a' (97, 0x61), 'm' (109, 0x6D), 'p' (112, 0x70),
+ *  'l' (108, 0x6C), 'e' (101, 0x65), '.' (46, 0x2E), 'i' (105, 0x69),
+ *  'n' (110, 0x6E), '.' (46, 0x2E), '1' (49, 0x31) }` instead. This is not an
+ *  issue for Google Test 1.11.0 but to work around this in a consistent manner
+ *  we just use `const char*` instead.
  */
 class CalcParserPureTest
-  : public CalcParserTest,
-    public ::testing::WithParamInterface<std::string_view> {};
+  : public CalcParserTest, public ::testing::WithParamInterface<const char*> {};
 
 /**
  * Test that parsing succeeds on the given input file.
