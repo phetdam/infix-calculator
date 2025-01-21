@@ -30,7 +30,14 @@
 #define PDCALC_PATCH_VERSION @PDCALC_PATCH_VERSION@
 
 /**
- * Project version string literal.
+ * Project build version info.
+ *
+ * For release builds this is empty.
+ */
+#define PDCALC_VERSION_INFO "@PDCALC_VERSION_INFO@"
+
+/**
+ * Project version string literal with version info.
  */
 #define PDCALC_VERSION "@PDCALC_VERSION@"
 

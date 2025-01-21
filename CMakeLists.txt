@@ -33,6 +33,46 @@ option(
     PDCALC_RAW_PIMPL
     "Use raw pointer instead of unique_ptr for parser PIMPL" OFF
 )
+# indicate build is a true release build, e.g. don't append build info
+option(PDCALC_IS_RELEASE "Indicate build is a true release build" OFF)
+
+# find Git for version info
+find_package(Git)
+if(Git_FOUND)
+    message(STATUS "Git version: ${GIT_VERSION_STRING}")
+else()
+    message(STATUS "Git version: None")
+endif()
+# no build tag if release
+if(PDCALC_IS_RELEASE)
+    set(PDCALC_VERSION_INFO "")
+    message(STATUS "Build tag: None")
+# otherwise, use Git to determine if possible
+elseif(Git_FOUND)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} rev-list --max-count=1 --abbrev-commit HEAD
+        TIMEOUT 5
+        RESULT_VARIABLE _cur_rev_res
+        OUTPUT_VARIABLE _cur_rev
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    # failed
+    if(_cur_rev_res)
+        message(WARNING "git rev-list failed; using -DEV as build tag")
+    # otherwise, use output
+    else()
+        set(PDCALC_VERSION_INFO "-${_cur_rev}")
+    endif()
+    # print and unset temps
+    message(STATUS "Build tag: ${PDCALC_VERSION_INFO}")
+    unset(_cur_rev_res)
+    unset(_cur_rev)
+endif()
+# if build tag not defined (e.g. no Git, rev-list failed) set to -DEV and print
+if(NOT DEFINED PDCALC_VERSION_INFO)
+    set(PDCALC_VERSION_INFO "-DEV")
+    message(STATUS "Build tag: ${PDCALC_VERSION_INFO}")
+endif()
 
 # indicate if generator is multi-config
 get_property(PDCALC_IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
@@ -97,7 +137,7 @@ include(ConfigCompile)
 set(PDCALC_MAJOR_VERSION ${PROJECT_VERSION_MAJOR})
 set(PDCALC_MINOR_VERSION ${PROJECT_VERSION_MINOR})
 set(PDCALC_PATCH_VERSION ${PROJECT_VERSION_PATCH})
-set(PDCALC_VERSION ${PROJECT_VERSION})
+set(PDCALC_VERSION ${PROJECT_VERSION}${PDCALC_VERSION_INFO})
 set(PDCALC_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
 set(PDCALC_SYSTEM_VERSION ${CMAKE_SYSTEM_VERSION})
 set(PDCALC_SYSTEM_ARCH ${CMAKE_SYSTEM_PROCESSOR})
