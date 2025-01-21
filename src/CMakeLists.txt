@@ -10,41 +10,28 @@ set(PDCALC_PARSER_INPUT ${PDCALC_PARSER_PREFIX}.y)
 set(PDCALC_PARSER_HEADER ${PDCALC_PARSER_PREFIX}.yy.h)
 set(PDCALC_PARSER_SOURCE ${PDCALC_PARSER_PREFIX}.yy.cc)
 
-# generate parser using Bison. header goes to include dir, source to src dir
-add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_PARSER_SOURCE}
-    COMMAND
-        # TODO: use no-precedence until all operators are defined
-        ${PDCALC_BISON} -Wall -Wno-precedence
-            # use historical --defines for Bison 3.5.1. Bison requires that the
-            # header is in the same directory as the generated source, so after
-            # generation, we then copy the header to the include dir
-            --defines=${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_PARSER_HEADER}
-            -o ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_PARSER_SOURCE}
-            ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_PARSER_INPUT}
-    COMMAND
-        ${CMAKE_COMMAND} -E copy_if_different
-            ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_PARSER_HEADER}
-            ${PDCALC_NAMESPACE_INCLUDE_DIR}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_PARSER_INPUT}
-    COMMENT "Running Bison to build parser ${PDCALC_PARSER_SOURCE}"
-    VERBATIM
-)
-# generate scanner using Flex. source goes to src dir
-add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_SOURCE}
+# generated lexer/parser files
+set(PDCALC_LEXER_OUTPUT ${PDCALC_BINARY_DIR}/src/${PDCALC_LEXER_SOURCE})
+set(PDCALC_PARSER_OUTPUT ${PDCALC_BINARY_DIR}/src/${PDCALC_PARSER_SOURCE})
+# add targets for lexer and parser + ensure CMake knows parser requires lexer
+FLEX_TARGET(
+    pdcalc_lexer
+    ${PDCALC_LEXER_INPUT} ${PDCALC_LEXER_OUTPUT}
     # don't define yywrap, just assume EOF is end of input. note Flex input
     # sets never-interactive as without it, isatty() is still used to handle
     # interactive input and will result in -Wimplicit-function-declaration.
     # also no need for bison-bridge if we are using the C++ Bison parser.
-    COMMAND
-        ${PDCALC_FLEX} -CFe --noyywrap --nounistd --warn
-            -o ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_SOURCE}
-            ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_INPUT}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${PDCALC_LEXER_INPUT}
-    COMMENT "Running Flex to build lexer ${PDCALC_LEXER_SOURCE}"
-    VERBATIM
+    COMPILE_FLAGS "-CFe --noyywrap --nounistd --warn"
 )
+BISON_TARGET(
+    pdcalc_parser
+    ${PDCALC_PARSER_INPUT} ${PDCALC_PARSER_OUTPUT}
+    COMPILE_FLAGS "-Wall -Wno-precedence"
+    # note: for Bison 3.5.1, should be using --defines instead of --header
+    DEFINES_FILE ${PDCALC_BINARY_DIR}/src/${PDCALC_PARSER_HEADER}
+)
+ADD_FLEX_BISON_DEPENDENCY(pdcalc_lexer pdcalc_parser)
+
 # MSVC-specific warnings that are generated from generated parser with /Wall on
 if(MSVC)
     set_source_files_properties(
@@ -58,8 +45,10 @@ endif()
 # pdcalc library implementing parser
 add_library(
     pdcalc_lib
-        ${PDCALC_LEXER_SOURCE}
-        ${PDCALC_PARSER_SOURCE}
+        # note: could use FLEX_pdcalc_lexer_OUTPUTS and
+        # BISON_pdcalc_parser_OUTPUTS but we only care about the source files
+        ${PDCALC_LEXER_OUTPUT}
+        ${PDCALC_PARSER_OUTPUT}
         calc_parser.cc
         calc_parser_impl.cc
 )
@@ -80,6 +69,12 @@ endif()
 if(PDCALC_RAW_PIMPL)
     target_compile_definitions(pdcalc_lib PUBLIC PDCALC_RAW_PIMPL)
 endif()
+# need to add current directory to includes for calc_parser_impl.hh and add
+# the src subdir of the build root for parser.yy.h
+target_include_directories(
+    pdcalc_lib PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR} ${PDCALC_BINARY_DIR}/src
+)
 # include directories interface changes based on build vs. install
 target_include_directories(
     pdcalc_lib PUBLIC

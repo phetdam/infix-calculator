@@ -102,6 +102,12 @@ else()
     message(STATUS "PIMPL method: unique_ptr")
 endif()
 
+# find Flex and Bison
+find_package(FLEX 2.6.2 REQUIRED)
+message(STATUS "Flex version: ${FLEX_VERSION}")
+find_package(BISON 3.5.1 REQUIRED)
+message(STATUS "Bison version: ${BISON_VERSION}")
+
 # current top-level build directory
 set(PDCALC_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -117,11 +123,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# set CMake module path
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
-# find Flex + Bison
-# FIXME: need to also report the version since we assume some min versions
-include(FindFlexBison)
 # find Google Test
 find_package(GTest 1.10)
 if(GTest_FOUND)
@@ -130,6 +131,8 @@ else()
     message(STATUS "Google Test version: None")
 endif()
 
+# set CMake module path
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 # set compiler options
 include(ConfigCompile)
 
