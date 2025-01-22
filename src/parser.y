@@ -152,7 +152,15 @@ input:
   %empty
 | input stmt
 
-/* Statement rule */
+/* Statement rule
+ *
+ * TODO:
+ *
+ * Consider using a std::variant<bool, int, double> to hold the result of the
+ * operation for further processing. Per-statement results can be held in a
+ * std::vector which would allow us to better test outputs and/or begin to
+ * support variable assignment (which definitely requires state management).
+ */
 stmt:
   ";"
 | i_expr ";"
