@@ -33,3 +33,23 @@ endif()
 
 # make Google Test tests known to CTest
 gtest_discover_tests(pdcalc_test)
+
+# test that the install command works properly
+set(_test_install_dir ${PDCALC_BINARY_DIR}/test_install)
+if(PDCALC_IS_MULTI_CONFIG)
+    add_test(
+        NAME pdcalc_test_install
+        COMMAND ${CMAKE_COMMAND}
+                --install ${PDCALC_BINARY_DIR}
+                --prefix ${_test_install_dir}
+                --config $<CONFIG>
+    )
+else()
+    add_test(
+        NAME pdcalc_test_install
+        COMMAND ${CMAKE_COMMAND}
+                --install ${PDCALC_BINARY_DIR} --prefix ${_test_install_dir}
+    )
+endif()
+# pdcalc_test_install is treated as a test install fixture setup
+set_tests_properties(pdcalc_test_install PROPERTIES FIXTURES_SETUP test_install)
