@@ -119,3 +119,84 @@ target_link_libraries(pdcalc_bin PRIVATE pdcalc_lib)
 set_target_properties(pdcalc_bin PROPERTIES OUTPUT_NAME pdcalc)
 # installation rule
 install(TARGETS pdcalc_bin)
+
+# -h, --help option tests
+add_test(NAME pdcalc_h COMMAND pdcalc_bin -h)
+add_test(NAME pdcalc_help COMMAND pdcalc_bin --help)
+set_tests_properties(
+    pdcalc_h pdcalc_help PROPERTIES
+    # just the summary line of the usage text
+    PASS_REGULAR_EXPRESSION "A statement-based infix calculator"
+)
+# -V, --version option tests
+add_test(NAME pdcalc_V COMMAND pdcalc_bin -V)
+add_test(NAME pdcalc_version COMMAND pdcalc_bin --version)
+set_tests_properties(
+    pdcalc_V pdcalc_version PROPERTIES
+    # should have the version info printed
+    PASS_REGULAR_EXPRESSION "pdcalc ${PDCALC_VERSION}"
+)
+# invalid options
+add_test(
+    NAME pdcalc_badopt
+    COMMAND pdcalc_bin -badopt ${PDCALC_TEST_DATA_DIR}/sample.in.2
+)
+add_test(
+    NAME pdcalc_longbadopt
+    COMMAND pdcalc_bin --longbadopt ${PDCALC_TEST_DATA_DIR}/sample.in.2
+)
+set_tests_properties(
+    pdcalc_badopt pdcalc_longbadopt PROPERTIES
+    PASS_REGULAR_EXPRESSION "Error: Unknown option"
+)
+# test running with trace options
+add_test(
+    NAME pdcalc_t
+    COMMAND pdcalc_bin -t ${PDCALC_TEST_DATA_DIR}/sample.in.1
+)
+add_test(
+    NAME pdcalc_trace
+    COMMAND pdcalc_bin --trace ${PDCALC_TEST_DATA_DIR}/sample.in.2
+)
+add_test(
+    NAME pdcalc_tl
+    COMMAND pdcalc_bin -tl ${PDCALC_TEST_DATA_DIR}/sample.in.1
+)
+add_test(
+    NAME pdcalc_tp
+    COMMAND pdcalc_bin -tp ${PDCALC_TEST_DATA_DIR}/sample.in.2
+)
+add_test(
+    NAME pdcalc_tlp
+    COMMAND pdcalc_bin -tlp ${PDCALC_TEST_DATA_DIR}/sample.in.3
+)
+add_test(
+    NAME pdcalc_trace_lexer
+    COMMAND pdcalc_bin --trace=lexer ${PDCALC_TEST_DATA_DIR}/sample.in.1
+)
+add_test(
+    NAME pdcalc_trace_parser
+    COMMAND pdcalc_bin --trace=parser ${PDCALC_TEST_DATA_DIR}/sample.in.2
+)
+add_test(
+    NAME pdcalc_trace_lexer_parser
+    COMMAND pdcalc_bin --trace=lexer,parser ${PDCALC_TEST_DATA_DIR}/sample.in.3
+)
+# test running with bad trace options
+add_test(
+    NAME pdcalc_tX
+    COMMAND pdcalc_bin -tX ${PDCALC_TEST_DATA_DIR}/sample.in.1
+)
+add_test(
+    NAME pdcalc_tXx
+    COMMAND pdcalc_bin -tXx ${PDCALC_TEST_DATA_DIR}/sample.in.2
+)
+add_test(
+    NAME pdcalc_tpX
+    COMMAND pdcalc_bin -tpX ${PDCALC_TEST_DATA_DIR}/sample.in.3
+)
+set_tests_properties(
+    pdcalc_tX pdcalc_tXx pdcalc_tpX PROPERTIES
+    PASS_REGULAR_EXPRESSION "-t received unknown specifier"
+)
+# TODO: add tests running with bad long trace options
