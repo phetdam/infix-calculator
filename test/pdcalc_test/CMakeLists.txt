@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION ${CMAKE_MINIMUM_REQUIRED_VERSION})
 
 # pdcalc_test: pdcalc unit test runner
-add_executable(pdcalc_test calc_parser_test.cc)
+add_executable(pdcalc_test calc_parser_test.cc type_traits_test.cc)
 # currently, only calc_parser_test.cc needs the PDCALC_TEST_DATA_DIR definition
 set_source_files_properties(
     calc_parser_test.cc PROPERTIES
