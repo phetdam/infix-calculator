@@ -134,7 +134,10 @@ endif()
 # set CMake module path
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 # set compiler options
+# TODO: maybe add a macro/function for this, don't use include() to run code
 include(ConfigCompile)
+# target helpers
+include(pdcalc_target_helpers)
 
 # set some variables used for the version + config info
 set(PDCALC_MAJOR_VERSION ${PROJECT_VERSION_MAJOR})

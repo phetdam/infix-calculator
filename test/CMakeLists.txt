@@ -39,29 +39,9 @@ set(_test_install_dir ${PDCALC_BINARY_DIR}/test_install)
 
 # pre-install test to remove the previously written test install directory.
 # this is to ensure pdcalc_test_install does a clean install each time
-# note: cmake -E rm is preferred for CMake 3.17
-if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.17)
-    add_test(
-        NAME pdcalc_prepare_test_install
-        # note: using -f to ensure success if _test_install_dir doesn't exist
-        COMMAND ${CMAKE_COMMAND} -E rm -rf ${_test_install_dir}
-    )
-else()
-    message(
-        WARNING
-        "pdcalc_prepare_test_install using cmake -E remove_directory instead "
-"of the preferred cmake -E rm -rf as CMake version is ${CMAKE_VERSION} < 3.17"
-    )
-    add_test(
-        NAME pdcalc_prepare_test_install
-        COMMAND ${CMAKE_COMMAND} -E remove_directory ${_test_install_dir}
-    )
-endif()
-# pdcalc_prepare_test_install is treated as a separate fixture so that if
-# pdcalc_test_install is run, CTest will first run pdcalc_prepare_test_install
-set_tests_properties(
-    pdcalc_prepare_test_install PROPERTIES
-    FIXTURES_SETUP test_install_clean
+pdcalc_add_rmdir_test(
+    pdcalc_prepare_test_install ${_test_install_dir}
+    SETUP test_install_clean
 )
 
 # test that the install command works properly
@@ -86,4 +66,31 @@ set_tests_properties(
     pdcalc_test_install PROPERTIES
     FIXTURES_SETUP test_install
     FIXTURES_REQUIRED test_install_clean
+)
+
+# test project build dir for CMake usage tests
+set(_test_cmake_binary_dir ${PDCALC_BINARY_DIR}/test_cmake_usage)
+
+# pre-install test to remove the previously written CMake test directory.
+# this is to ensure pdcalc_test_install does a clean install each time
+# note: this can be done in parallel to the install dir cleanup
+pdcalc_add_rmdir_test(
+    pdcalc_prepare_cmake_usage ${_test_cmake_binary_dir}
+    SETUP test_cmake_clean
+)
+
+# test that an external project can run a CMake configure step successfully
+add_test(
+    NAME pdcalc_cmake_config_test
+    COMMAND ${CMAKE_COMMAND}
+            -S ${CMAKE_CURRENT_SOURCE_DIR}/pdcalc_cmake_usage_test
+            -B ${_test_cmake_binary_dir}
+            -Dpdcalc_ROOT=${_test_install_dir}
+            -DPDCALC_FIND_VERSION=${PROJECT_VERSION}
+)
+# test_install fixture must be set up already
+set_tests_properties(
+    pdcalc_cmake_config_test PROPERTIES
+    FIXTURES_SETUP test_cmake_config
+    FIXTURES_REQUIRED "test_install;test_cmake_clean"
 )
