@@ -30,7 +30,7 @@ auto force_identity(T&& /*a*/, pdcalc::type_identity_t<T> b)
 }
 
 /**
- * `TypeIdentityTest` test input type.
+ * `TypeIdentityTest` test evaluation type.
  *
  * Uses `force_identity` to evaluate if `type_identity_t` works in `decltype`.
  *
@@ -38,7 +38,7 @@ auto force_identity(T&& /*a*/, pdcalc::type_identity_t<T> b)
  * @tparam U Second type, must convert to `T`
  */
 template <typename T, typename U, typename = void>
-struct type_identity_test_input : std::false_type {};
+struct type_identity_eval_traits : std::false_type {};
 
 /**
  * Partial specialization if `force_identity` invocation works properly.
@@ -47,14 +47,14 @@ struct type_identity_test_input : std::false_type {};
  * @tparam U Second type, must convert to `T`
  */
 template <typename T, typename U>
-struct type_identity_test_input<T, U, std::enable_if_t<std::is_same_v<
+struct type_identity_eval_traits<T, U, std::enable_if_t<std::is_same_v<
   T, decltype(force_identity(std::declval<T>(), std::declval<U>()))>> >
   : std::true_type {};
 
 /**
  * Template test fixture for testing `type_identity`.
  *
- * @tparam T Input
+ * @tparam T Pair of types
  */
 template <typename T>
 class TypeIdentityTest;
@@ -66,18 +66,17 @@ class TypeIdentityTest;
  * @tparam U Second type, must convert to `T`
  */
 template <typename T, typename U>
-class TypeIdentityTest<type_identity_test_input<T, U>>
-  : public ::testing::Test {
+class TypeIdentityTest<std::pair<T, U>> : public ::testing::Test {
 protected:
   // test result
-  static constexpr bool result_ = type_identity_test_input<T, U>::value;
+  static constexpr bool result_ = type_identity_eval_traits<T, U>::value;
 };
 
 using TypeIdentityTestTypes = ::testing::Types<
-  type_identity_test_input<double, int>,
-  type_identity_test_input<long, short>,
-  type_identity_test_input<std::string, const char*>,
-  type_identity_test_input<std::string, const char[20]>
+  std::pair<double, int>,
+  std::pair<long, short>,
+  std::pair<std::string, const char*>,
+  std::pair<std::string, const char[20]>
 >;
 TYPED_TEST_SUITE(TypeIdentityTest, TypeIdentityTestTypes);
 
