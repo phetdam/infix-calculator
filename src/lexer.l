@@ -148,7 +148,8 @@ NEWLINES       \n+
 "cos"                   return yy::parser::make_F_COS(loc);
 "tan"                   return yy::parser::make_F_TAN(loc);
   /* Identifiers */
-  /* {IDEN}                  return yy::parser::make_IDEN(yytext, loc); */
+  /* TODO: use calc_parser_impl's symbol table to disambiguate iden types */
+  /* {IDEN}                  return yy::parser::make_LONG_IDEN(yytext, loc); */
   /* Default rule */
 .                       throw yy::parser::syntax_error{
                           loc,
