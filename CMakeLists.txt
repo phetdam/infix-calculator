@@ -123,8 +123,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# find Google Test
-find_package(GTest 1.10)
+# find Google Test version >= than min. requested version
+set(PDCALC_GTEST_VERSION)
+find_package(GTest ${PDCALC_GTEST_VERSION})
 if(GTest_FOUND)
     message(STATUS "Google Test version: ${GTest_VERSION}")
 else()
@@ -203,14 +204,9 @@ endif()
 # both single- and multi-config generators may have config-independent includes
 include_directories(${PDCALC_BINARY_DIR}/include)
 
-# add src, add test only if Google Test is found
+# add src, test (only some tests use Google Test)
 add_subdirectory(src)
-
-if(GTest_FOUND)
-    add_subdirectory(test)
-else()
-    message(STATUS "Skipping tests as Google Test ${GTest_VERSION} was not found")
-endif()
+add_subdirectory(test)
 
 # configure package config file
 # note: won't change across build configs so we just put in top-level
