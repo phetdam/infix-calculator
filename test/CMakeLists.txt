@@ -34,8 +34,37 @@ endif()
 # make Google Test tests known to CTest
 gtest_discover_tests(pdcalc_test)
 
-# test that the install command works properly
+# test installation dir for test_install tests
 set(_test_install_dir ${PDCALC_BINARY_DIR}/test_install)
+
+# pre-install test to remove the previously written test install directory.
+# this is to ensure pdcalc_test_install does a clean install each time
+# note: cmake -E rm is preferred for CMake 3.17
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.17)
+    add_test(
+        NAME pdcalc_prepare_test_install
+        # note: using -f to ensure success if _test_install_dir doesn't exist
+        COMMAND ${CMAKE_COMMAND} -E rm -rf ${_test_install_dir}
+    )
+else()
+    message(
+        WARNING
+        "pdcalc_prepare_test_install using cmake -E remove_directory instead "
+"of the preferred cmake -E rm -rf as CMake version is ${CMAKE_VERSION} < 3.17"
+    )
+    add_test(
+        NAME pdcalc_prepare_test_install
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${_test_install_dir}
+    )
+endif()
+# pdcalc_prepare_test_install is treated as a separate fixture so that if
+# pdcalc_test_install is run, CTest will first run pdcalc_prepare_test_install
+set_tests_properties(
+    pdcalc_prepare_test_install PROPERTIES
+    FIXTURES_SETUP test_install_clean
+)
+
+# test that the install command works properly
 if(PDCALC_IS_MULTI_CONFIG)
     add_test(
         NAME pdcalc_test_install
@@ -51,5 +80,10 @@ else()
                 --install ${PDCALC_BINARY_DIR} --prefix ${_test_install_dir}
     )
 endif()
-# pdcalc_test_install is treated as a test install fixture setup
-set_tests_properties(pdcalc_test_install PROPERTIES FIXTURES_SETUP test_install)
+# pdcalc_test_install is sets up the test_install fixture and depends on the
+# test_install_clean fixture so it runs *after* pdcalc_prepare_test_install
+set_tests_properties(
+    pdcalc_test_install PROPERTIES
+    FIXTURES_SETUP test_install
+    FIXTURES_REQUIRED test_install_clean
+)
