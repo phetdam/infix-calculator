@@ -80,7 +80,7 @@ else()
                 --install ${PDCALC_BINARY_DIR} --prefix ${_test_install_dir}
     )
 endif()
-# pdcalc_test_install is sets up the test_install fixture and depends on the
+# pdcalc_test_install sets up the test_install fixture and depends on the
 # test_install_clean fixture so it runs *after* pdcalc_prepare_test_install
 set_tests_properties(
     pdcalc_test_install PROPERTIES
