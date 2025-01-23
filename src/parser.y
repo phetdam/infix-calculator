@@ -108,8 +108,15 @@
 %token NOT_EQUALS "!="
 %token SEMICOLON ";"
 %token COMMA ","
-/* Identifiers */
-/* %token <std::string> IDEN */
+/* Identifiers
+ *
+ * We have typed identifiers, which are intended to be verified by actually
+ * looking up the parser table of symbols for the valid identifier. The lexer
+ * will perform this lookup using and disambiguate the identifier type.
+ */
+%token <std::string> BOOL_IDEN
+%token <std::string> LONG_IDEN
+%token <std::string> DOUBLE_IDEN
 /* Type tokens */
 /* %token T_LONG "long" */
 /* %token T_BOOL "bool" */
@@ -156,7 +163,7 @@ input:
  *
  * TODO:
  *
- * Consider using a std::variant<bool, int, double> to hold the result of the
+ * Consider using a std::variant<bool, long, double> to hold the result of the
  * operation for further processing. Per-statement results can be held in a
  * std::vector which would allow us to better test outputs and/or begin to
  * support variable assignment (which definitely requires state management).
@@ -182,6 +189,20 @@ i_expr:
   {
     $$ = $1;
   }
+/*
+| LONG_IDEN
+  {
+    // perform lookup (e.g. if we use std::optional<calc_symbol>)
+    auto maybe_sym = driver.find_symbol($1);
+    if (!maybe_sym) {
+      error(driver.location_, "Identifier " + $1 + " not defined yet");
+      YYABORT;
+    }
+    // otherwise, we can assign the value. no need to check type (lexer handled)
+    // TODO: may consider using visitor to abstract this
+    $$ = maybe_sym->get<long>();
+  }
+*/
 | "(" i_expr ")"
   {
     $$ = $2;
