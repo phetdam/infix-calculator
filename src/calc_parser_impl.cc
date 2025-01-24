@@ -10,8 +10,7 @@
 #include <filesystem>
 #include <string_view>
 
-#include "parser.yy.h"
-#include "pdcalc/calc_symbol.hh"
+#include "pdcalc/calc_symbol.hh"  // includes parser.yy.h
 
 namespace pdcalc {
 
