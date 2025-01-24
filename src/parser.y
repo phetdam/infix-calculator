@@ -7,55 +7,84 @@
  */
 
 %{
-  // MSVC reports __STDC_WANT_SECURE_LIB__ not defined in limits.h, but this is
-  // defined to 1 in corecrt.h, hence the conditional inclusion.
-  #ifdef _WIN32
-  #include <corecrt.h>
-  #endif  // _WIN32
+// MSVC reports __STDC_WANT_SECURE_LIB__ not defined in limits.h, but this is
+// defined to 1 in corecrt.h, hence the conditional inclusion.
+#ifdef _WIN32
+#include <corecrt.h>
+#endif  // _WIN32
 
-  #include <algorithm>
-  #include <cmath>
-  #include <ios>
-  #include <iostream>
-  #include <sstream>
-  #include <string>
+#include <algorithm>
+#include <cmath>
+#include <ios>
+#include <iostream>
+#include <sstream>
+#include <string>
 
-  #include "calc_parser_impl.h"
+#include "calc_parser_impl.h"
 
-  /**
-   * Assign result of division to a target while handling divide by zero.
-   *
-   * On error, the parse driver's last error is updated.
-   *
-   * @note This should only be used from within the Bison-generated parser.
-   *
-   * @param target Target to assign result to
-   * @param left Left operand
-   * @param right Right operand
-   */
-  #define PDCALC_YY_SAFE_DIVIDE(target, left, right) \
-    do { \
-      if (right) \
-        target = (left) / (right); \
-      else { \
-        error( \
-          driver.location_, \
-          std::to_string(left) + " / " + std::to_string(right) + \
-            " is division by zero" \
-        ); \
-        YYABORT; \
-      } \
+/**
+ * Assign result of division to a target while handling divide by zero.
+ *
+ * On error, the parse driver's last error is updated.
+ *
+ * @note This should only be used from within the Bison-generated parser.
+ *
+ * @param target Target to assign result to
+ * @param left Left operand
+ * @param right Right operand
+ */
+#define PDCALC_YY_SAFE_DIVIDE(target, left, right) \
+  do { \
+    if (right) \
+      target = (left) / (right); \
+    else { \
+      error( \
+        driver.location_, \
+        std::to_string(left) + " / " + std::to_string(right) + \
+          " is division by zero" \
+      ); \
+      YYABORT; \
     } \
-    while (0)
+  } \
+  while (false)
 
-  /**
-   * Print an expression truth value to stdout as "true" or "false".
-   *
-   * @param value Boolean value of an expression
-   */
-  #define PDCALC_YY_PRINT_BOOL(value) \
-    driver.sink() << "<bool> " << std::boolalpha << (value) << \
-      std::noboolalpha << std::endl;
+/**
+ * Print an expression truth value to stdout as "true" or "false".
+ *
+ * @param value Boolean value of an expression
+ */
+#define PDCALC_YY_PRINT_BOOL(value) \
+  driver.sink() << "<bool> " << std::boolalpha << (value) << \
+    std::noboolalpha << std::endl
+
+/**
+ * Report an undefined symbol error.
+ *
+ * @param iden `std::string` symbol identifier
+ */
+#define PDCALC_YY_UNDEFINED_SYMBOL(iden) \
+  error(driver.location_, "Identifier '" + (iden) + "' not defined yet")
+
+/**
+ * Check that an identifier corresponds to a symbol and extract its value.
+ *
+ * @param out Semantic value to assign to
+ * @param iden Symbol identifier
+ * @param type Symbol value C++ type
+ */
+#define PDCALC_YY_GET_SYMBOL_VALUE(out, iden, type) \
+  do { \
+    /* lookup symbol */ \
+    auto sym = driver.get_symbol(iden); \
+    /* doesn't exist, so report error and abort */ \
+    if (!sym) { \
+      PDCALC_YY_UNDEFINED_SYMBOL(iden); \
+      YYABORT; \
+    } \
+    /* otherwise, assign the value. no need to check type (lexer handled) */ \
+    out = sym->get<type>(); \
+  } \
+  while (false)
 %}
 
 /* C++ LR parser using variants handling complete symbols with error reporting.
@@ -163,10 +192,8 @@ input:
  *
  * TODO:
  *
- * Consider using a std::variant<bool, long, double> to hold the result of the
- * operation for further processing. Per-statement results can be held in a
- * std::vector which would allow us to better test outputs and/or begin to
- * support variable assignment (which definitely requires state management).
+ * Enable identifier assignment. This does not result in a printout but will
+ * update the calc_parser_impl symbol table.
  */
 stmt:
   ";"
@@ -189,20 +216,10 @@ i_expr:
   {
     $$ = $1;
   }
-/*
 | LONG_IDEN
   {
-    // perform lookup (e.g. if we use std::optional<calc_symbol>)
-    auto maybe_sym = driver.find_symbol($1);
-    if (!maybe_sym) {
-      error(driver.location_, "Identifier " + $1 + " not defined yet");
-      YYABORT;
-    }
-    // otherwise, we can assign the value. no need to check type (lexer handled)
-    // TODO: may consider using visitor to abstract this
-    $$ = maybe_sym->get<long>();
+    PDCALC_YY_GET_SYMBOL_VALUE($$, $1, long);
   }
-*/
 | "(" i_expr ")"
   {
     $$ = $2;
@@ -266,6 +283,10 @@ d_expr:
   FLOATING
   {
     $$ = $1;
+  }
+| DOUBLE_IDEN
+  {
+    PDCALC_YY_GET_SYMBOL_VALUE($$, $1, double);
   }
 | "(" d_expr ")"
   {
@@ -390,6 +411,10 @@ b_expr:
   TRUTH
   {
     $$ = $1;
+  }
+| BOOL_IDEN
+  {
+    PDCALC_YY_GET_SYMBOL_VALUE($$, $1, bool);
   }
 | "(" b_expr ")"
   {

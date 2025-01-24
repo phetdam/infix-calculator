@@ -8,6 +8,10 @@
 #include "calc_parser_impl.h"
 
 #include <filesystem>
+#include <string_view>
+
+#include "parser.yy.h"
+#include "pdcalc/calc_symbol.hh"
 
 namespace pdcalc {
 
@@ -38,6 +42,27 @@ bool calc_parser_impl::parse(
     return false;
   // last_error_ should already have been set if parsing is failing
   return !status;
+}
+
+calc_parser_impl&
+calc_parser_impl::add_symbol(std::string_view iden, symbol_value_type value)
+{
+  // new symbol to insert
+  calc_symbol sym{iden, std::move(value)};
+  // attempt insert. if failed (existing symbol), overwrite
+  auto [it, inserted] = symbols_.insert(sym);
+  if (!inserted) {
+    symbols_.erase(it);
+    symbols_.insert(std::move(sym));
+  }
+  return *this;
+}
+
+const calc_symbol* calc_parser_impl::get_symbol(std::string_view iden) const
+{
+  // lookup using dummy
+  auto it = symbols_.find(calc_symbol{iden});
+  return (it == symbols_.end()) ? nullptr : &*it;
 }
 
 }  // namespace pdcalc
