@@ -11,7 +11,7 @@
 #include <ostream>
 #include <string>
 
-#include "calc_parser_impl.h"
+#include "calc_parser_impl.hh"
 
 namespace pdcalc {
 

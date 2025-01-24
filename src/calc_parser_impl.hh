@@ -1,12 +1,12 @@
 /**
- * @file pdcalc/calc_parser_impl.h
+ * @file calc_parser_impl.hh
  * @author Derek Huang
  * @brief C++ header for the infix calculator parse driver implementation
  * @copyright MIT License
  */
 
-#ifndef PDCALC_CALC_PARSER_IMPL_H_
-#define PDCALC_CALC_PARSER_IMPL_H_
+#ifndef PDCALC_CALC_PARSER_IMPL_HH_
+#define PDCALC_CALC_PARSER_IMPL_HH_
 
 #include <filesystem>
 #include <iostream>
@@ -173,4 +173,4 @@ private:
 
 }  // namespace pdcalc
 
-#endif  // PDCALC_CALC_PARSER_IMPL_H_
+#endif  // PDCALC_CALC_PARSER_IMPL_HH_

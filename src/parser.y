@@ -20,7 +20,7 @@
 #include <sstream>
 #include <string>
 
-#include "calc_parser_impl.h"
+#include "calc_parser_impl.hh"
 
 /**
  * Assign result of division to a target while handling divide by zero.

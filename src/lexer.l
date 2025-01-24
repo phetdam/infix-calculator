@@ -31,7 +31,7 @@ PDCALC_MSVC_WARNING_POP()
 
 #include <string>
 
-#include "calc_parser_impl.h"
+#include "calc_parser_impl.hh"
 
 /**
  * User-defined action run after token match before its rule action.
