@@ -16,7 +16,8 @@ namespace pdcalc::testing {
  * Set up a Google Test typed test suite.
  *
  * This also sets up the list of types appropriately. Use `PDCALC_IDENTITY` as
- * necessary to ensure that each type is treated as a single macro argument.
+ * necessary to ensure that each type is treated as a single macro argument. To
+ * reduce verbosity, in test source files, use `#define I_ PDCALC_IDENTITY`.
  *
  * @param fixture Test fixture template identifier
  * @param ... Variadic list of types
