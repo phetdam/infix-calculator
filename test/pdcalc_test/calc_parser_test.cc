@@ -1,11 +1,11 @@
 /**
  * @file calc_parser_test.cc
  * @author Derek Huang
- * @brief calc_parser.h unit tests
+ * @brief calc_parser.hh unit tests
  * @copyright MIT License
  */
 
-#include "pdcalc/calc_parser.h"
+#include "pdcalc/calc_parser.hh"
 
 #include <cstdlib>
 #include <cstring>

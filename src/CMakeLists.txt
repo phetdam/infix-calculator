@@ -88,7 +88,7 @@ endif()
 # set public headers for pdcalc_lib
 set(
     PDCALC_PUBLIC_HEADERS
-    ${PDCALC_INCLUDE_DIR}/pdcalc/calc_parser.h
+    ${PDCALC_INCLUDE_DIR}/pdcalc/calc_parser.hh
     ${PDCALC_INCLUDE_DIR}/pdcalc/common.h
     ${PDCALC_INCLUDE_DIR}/pdcalc/dllexport.h
     ${PDCALC_INCLUDE_DIR}/pdcalc/features.h

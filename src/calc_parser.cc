@@ -5,7 +5,7 @@
  * @copyright MIT License
  */
 
-#include "pdcalc/calc_parser.h"
+#include "pdcalc/calc_parser.hh"
 
 #include <filesystem>
 #include <ostream>
