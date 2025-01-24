@@ -43,35 +43,7 @@ using type_identity_t = typename type_identity<T>::type;
  * @tparam U Type candidate
  */
 template <typename T, typename U>
-struct in_tuple_types : std::false_type {};
-
-namespace detail {
-
-/**
- * Implenentation class to check if a type is in the tuple's list of types.
- *
- * @tparam I `std::index_sequence<Is...>` with indices 0 until number of types
- * @tparam T `std::tuple<Ts...>`
- * @tparam U Target type
- */
-template <typename I, typename T, typename U>
-struct in_tuple_types_impl : std::false_type {};
-
-/**
- * Partial specialization with actual checking logic.
- *
- * Checks that `U` matches at least one of the tuple types.
- *
- * @tparam Is... Indices `0` through `sizeof...(Ts) - 1`
- * @tparam Ts... Tuple type pack
- * @tparam U Target type
- */
-template <std::size_t... Is, typename... Ts, typename U>
-struct in_tuple_types_impl<std::index_sequence<Is...>, std::tuple<Ts...>, U>
-  : std::bool_constant<
-      (std::is_same_v<std::tuple_element_t<Is, std::tuple<Ts...>>, U> || ...)> {};
-
-}  // namespace detail
+struct tuple_contains : std::false_type {};
 
 /**
  * Partial specializaton to determine if `T` is the in list of tuple types.
@@ -80,17 +52,17 @@ struct in_tuple_types_impl<std::index_sequence<Is...>, std::tuple<Ts...>, U>
  * @tparam T Target type
  */
 template <typename... Ts, typename T>
-struct in_tuple_types<std::tuple<Ts...>, T> : detail::in_tuple_types_impl<
-  std::index_sequence_for<Ts...>, std::tuple<Ts...>, T> {};
+struct tuple_contains<std::tuple<Ts...>, T>
+  : std::bool_constant<(std::is_same_v<T, Ts> || ...)> {};
 
 /**
  * Indicate that a target type is in the list of tuple types.
  *
- * @tparam T Target type
- * @tparam Ts... Tuple type pack
+ * @tparam T `std::tuple<Ts...>` type
+ * @tparam U Type candidate
  */
-template <typename T, typename... Ts>
-constexpr bool in_tuple_types_v = in_tuple_types<std::tuple<Ts...>, T>::value;
+template <typename T, typename U>
+constexpr bool tuple_contains_v = tuple_contains<T, U>::value;
 
 /**
  * Traits class to extract the type pack of a `std::variant` into a tuple.
@@ -135,7 +107,7 @@ struct is_variant_alternative : std::false_type {};
  */
 template <typename... Ts, typename T>
 struct is_variant_alternative<std::variant<Ts...>, T> : std::bool_constant<
-  in_tuple_types_v<variant_alternatives_t<std::variant<Ts...>>, T> > {};
+  tuple_contains_v<variant_alternatives_t<std::variant<Ts...>>, T> > {};
 
 /**
  * Indicate a given type is one of the variant's alternative types.

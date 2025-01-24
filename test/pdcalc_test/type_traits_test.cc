@@ -88,4 +88,44 @@ TYPED_TEST(TypeIdentityTest, Test)
   EXPECT_TRUE(this->result_);
 }
 
+/**
+ * Template test fixture for testing `tuple_contains`.
+ *
+ * @tparam T Pair of truth type, `std::pair<input_type, tuple_type>`
+ */
+template <typename T>
+class TupleContainsTest;
+
+/**
+ * Partial specialization for real `tuple_contains` tests.
+ *
+ * @tparam R Truth type
+ * @tparam T Input type
+ * @tparam Ts... Tuple types
+ */
+template <typename R, typename T, typename... Ts>
+class TupleContainsTest<std::pair<R, std::pair<T, std::tuple<Ts...>>>>
+  : public ::testing::Test {
+protected:
+  // expected and actual result
+  static constexpr bool expected_ = R::value;
+  static constexpr bool actual_ = pdcalc::tuple_contains_v<std::tuple<Ts...>, T>;
+};
+
+using TupleContainsTestTypes = ::testing::Types<
+  std::pair<std::true_type, std::pair<int, std::tuple<double, char, int>>>,
+  std::pair<std::true_type, std::pair<unsigned, std::tuple<unsigned, char, int>>>,
+  std::pair<std::false_type, std::pair<int, std::tuple<char, unsigned>>>,
+  std::pair<std::true_type, std::pair<void*, std::tuple<char, const char*, void*>>>
+>;
+TYPED_TEST_SUITE(TupleContainsTest, TupleContainsTestTypes);
+
+/**
+ * Test that `tuple_contains_t` works as expected.
+ */
+TYPED_TEST(TupleContainsTest, Test)
+{
+  EXPECT_EQ(this->expected_, this->actual_);
+}
+
 }  // namespace
