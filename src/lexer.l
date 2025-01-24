@@ -14,35 +14,35 @@
 %option noinput nounput never-interactive debug
 
 %{
-  // only contains warning macro helpers, so ok to put first
-  #include "pdcalc/warnings.h"
+// only contains warning macro helpers, so ok to put first
+#include "pdcalc/warnings.h"
 
-  #include <cerrno>
-  #include <cstdio>
-  #include <cstring>
+#include <cerrno>
+#include <cstdio>
+#include <cstring>
 
-  // MSVC complains that stdint.h is redefining fixed-width integral type
-  // macros like INT8_MIN, UINT32_MAX, etc. so disable this warning. this can
-  // also be avoided by putting #include <cstdio> in a top% block
-  PDCALC_MSVC_WARNING_PUSH()
-  PDCALC_MSVC_WARNING_DISABLE(4005)
-  #include <stdexcept>
-  PDCALC_MSVC_WARNING_POP()
+// MSVC complains that stdint.h is redefining fixed-width integral type macros
+// like INT8_MIN, UINT32_MAX, etc. so disable this warning. this can also be
+// avoided by putting #include <cstdio> in a top% block
+PDCALC_MSVC_WARNING_PUSH()
+PDCALC_MSVC_WARNING_DISABLE(4005)
+#include <stdexcept>
+PDCALC_MSVC_WARNING_POP()
 
-  #include <string>
+#include <string>
 
-  #include "calc_parser_impl.h"
+#include "calc_parser_impl.h"
 
-  /**
-   * User-defined action run after token match before its rule action.
-   *
-   * Here we just advance the location reference's end position columns by the
-   * length of the token that was just matched to track locations.
-   *
-   * Note that `YY_USER_ACTION` must be a full statement ending with a
-   * semicolon or braced context as otherwise you will get a compile error.
-   */
-  #define YY_USER_ACTION loc.columns(yyleng);
+/**
+ * User-defined action run after token match before its rule action.
+ *
+ * Here we just advance the location reference's end position columns by the
+ * length of the token that was just matched to track locations.
+ *
+ * Note that `YY_USER_ACTION` must be a full statement ending with a semicolon
+ * or braced context as otherwise you will get a compile error.
+ */
+#define YY_USER_ACTION loc.columns(yyleng);
 %}
 
 /* Start conditions */
