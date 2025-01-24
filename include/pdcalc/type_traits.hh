@@ -112,12 +112,11 @@ struct is_variant_alternative<std::variant<Ts...>, T> : std::bool_constant<
 /**
  * Indicate a given type is one of the variant's alternative types.
  *
- * @tparam T Target type
- * @tparam Ts... Variant alternatives
+ * @tparam T `std::variant<Ts...>`
+ * @tparam U Type candidate
  */
-template <typename T, typename... Ts>
-constexpr bool
-is_variant_alternative_v = is_variant_alternative<std::variant<Ts...>, T>::value;
+template <typename T, typename U>
+constexpr bool is_variant_alternative_v = is_variant_alternative<T, U>::value;
 
 /**
  * SFINAE helper for checking if a type is a variant's alternative type.
