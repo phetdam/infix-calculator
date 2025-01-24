@@ -68,6 +68,9 @@
 /**
  * Check that an identifier corresponds to a symbol and extract its value.
  *
+ * @todo Can remove this later as the lexer should already check whether or not
+ *  a symbol is the `calc_parser_impl` driver symbol table.
+ *
  * @param out Semantic value to assign to
  * @param iden Symbol identifier
  * @param type Symbol value C++ type

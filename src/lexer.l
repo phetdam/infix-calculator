@@ -30,8 +30,12 @@ PDCALC_MSVC_WARNING_DISABLE(4005)
 PDCALC_MSVC_WARNING_POP()
 
 #include <string>
+#include <string_view>
+#include <variant>
 
-#include "calc_parser_impl.hh"
+// {FIXME} should namespace source with pdcalc
+#include "calc_parser_impl.hh"    // includes parser.yy.h
+#include "pdcalc/calc_symbol.hh"
 
 /**
  * User-defined action run after token match before its rule action.
@@ -43,6 +47,54 @@ PDCALC_MSVC_WARNING_POP()
  * or braced context as otherwise you will get a compile error.
  */
 #define YY_USER_ACTION loc.columns(yyleng);
+
+namespace pdcalc {
+
+/**
+ * Symbol visitor to determine the correct symbol token via its value type.
+ */
+class symbol_token_visitor {
+public:
+  /**
+   * Ctor.
+   *
+   * @param iden Symbol identifier
+   * @param loc Parser location
+   */
+  symbol_token_visitor(std::string_view iden, const yy::location& loc) noexcept
+    : iden_{iden}, loc_{loc}
+  {}
+
+  /**
+   * Indicate to the Bison parser that identifier has a boolean value.
+   */
+  auto operator()(bool value) const
+  {
+    return yy::parser::make_BOOL_IDEN({iden_.begin(), iden_.end()}, loc_);
+  }
+
+  /**
+   * Indicate to the Bison parser that identifier has a long value.
+   */
+  auto operator()(long value) const
+  {
+    return yy::parser::make_LONG_IDEN({iden_.begin(), iden_.end()}, loc_);
+  }
+
+  /**
+   * Indicate to the Bison parser that identifier has a double value.
+   */
+  auto operator()(double value) const
+  {
+    return yy::parser::make_DOUBLE_IDEN({iden_.begin(), iden_.end()}, loc_);
+  }
+
+private:
+  std::string_view iden_;
+  const yy::location& loc_;
+};
+
+}  // namespace pdcalc
 %}
 
 /* Start conditions */
@@ -148,8 +200,19 @@ NEWLINES       \n+
 "cos"                   return yy::parser::make_F_COS(loc);
 "tan"                   return yy::parser::make_F_TAN(loc);
   /* Identifiers */
-  /* TODO: use calc_parser_impl's symbol table to disambiguate iden types */
-  /* {IDEN}                  return yy::parser::make_LONG_IDEN(yytext, loc); */
+{IDEN}                  {
+                          // lookup symbol. if not found, error
+                          auto sym = driver.get_symbol(yytext);
+                          if (!sym) {
+                            throw yy::parser::syntax_error{
+                              loc,
+                              "Undefined symbol '" + std::string{yytext} + "'"
+                            };
+                          }
+                          // otherwise, apply visitor to get correct token
+                          pdcalc::symbol_token_visitor vis{yytext, loc};
+                          return std::visit(vis, sym->value());
+                        }
   /* Default rule */
 .                       throw yy::parser::syntax_error{
                           loc,
