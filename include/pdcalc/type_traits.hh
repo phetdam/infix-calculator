@@ -121,12 +121,11 @@ constexpr bool is_variant_alternative_v = is_variant_alternative<T, U>::value;
 /**
  * SFINAE helper for checking if a type is a variant's alternative type.
  *
- * @tparam T Target type
- * @tparam Ts... Variant alternatives
+ * @tparam T `std::variant<Ts...>`
+ * @tparam U Type candidate
  */
-template <typename T, typename... Ts>
-using is_variant_alternative_t = std::
-  enable_if_t<is_variant_alternative_v<std::variant<Ts...>, T>>;
+template <typename T, typename U>
+using is_variant_alternative_t = std::enable_if_t<is_variant_alternative_v<T, U>>;
 
 }  // namespace pdcalc
 
