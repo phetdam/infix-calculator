@@ -32,10 +32,16 @@ BISON_TARGET(
 )
 ADD_FLEX_BISON_DEPENDENCY(pdcalc_lexer pdcalc_parser)
 
-# MSVC-specific warnings that are generated from generated parser with /Wall on
+# MSVC-specific warnings from the generated lexer + parser with /Wall on
 if(MSVC)
     set_source_files_properties(
-        ${PDCALC_PARSER_SOURCE} PROPERTIES
+        ${PDCALC_LEXER_OUTPUT} PROPERTIES
+        # C4868: cannot enforce left-to-right eval in braced init list (this is
+        #   due to taking string_view by value in symbol_token_visitor)
+        COMPILE_OPTIONS "/wd4868"
+    )
+    set_source_files_properties(
+        ${PDCALC_PARSER_OUTPUT} PROPERTIES
         # C4127: conditional expression is constant
         # C4365: signed/unsigned mismatch
         COMPILE_OPTIONS "/wd4127;/wd4365"

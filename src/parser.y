@@ -157,6 +157,10 @@
 %token <std::string> DOUBLE_IDEN
 %token <std::string> UNKNOWN_IDEN
 /* Built-in function names */
+%token F_EXP "exp"
+%token F_LOG "log"
+%token F_LOG2 "log2"
+%token F_LOG10 "log10"
 %token F_SQRT "sqrt"
 %token F_MAX "max"
 %token F_MIN "min"
@@ -481,6 +485,38 @@ d_expr:
     PDCALC_YY_SAFE_DIVIDE($$, $1, $3);
   }
 /* Unary function calls */
+| "exp" "(" d_expr ")"
+  {
+    $$ = std::exp($3);
+  }
+| "exp" "(" i_expr ")"
+  {
+    $$ = std::exp($3);
+  }
+| "log" "(" d_expr ")"
+  {
+    $$ = std::log($3);
+  }
+| "log" "(" i_expr ")"
+  {
+    $$ = std::log($3);
+  }
+| "log2" "(" d_expr ")"
+  {
+    $$ = std::log2($3);
+  }
+| "log2" "(" i_expr ")"
+  {
+    $$ = std::log2($3);
+  }
+| "log10" "(" d_expr ")"
+  {
+    $$ = std::log10($3);
+  }
+| "log10" "(" i_expr ")"
+  {
+    $$ = std::log10($3);
+  }
 | "sqrt" "(" d_expr ")"
   {
     $$ = std::sqrt($3);

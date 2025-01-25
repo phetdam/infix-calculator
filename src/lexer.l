@@ -68,7 +68,7 @@ public:
   /**
    * Indicate to the Bison parser that identifier has a boolean value.
    */
-  auto operator()(bool value) const
+  auto operator()(bool /*value*/) const
   {
     return yy::parser::make_BOOL_IDEN({iden_.begin(), iden_.end()}, loc_);
   }
@@ -76,7 +76,7 @@ public:
   /**
    * Indicate to the Bison parser that identifier has a long value.
    */
-  auto operator()(long value) const
+  auto operator()(long /*value*/) const
   {
     return yy::parser::make_LONG_IDEN({iden_.begin(), iden_.end()}, loc_);
   }
@@ -84,7 +84,7 @@ public:
   /**
    * Indicate to the Bison parser that identifier has a double value.
    */
-  auto operator()(double value) const
+  auto operator()(double /*value*/) const
   {
     return yy::parser::make_DOUBLE_IDEN({iden_.begin(), iden_.end()}, loc_);
   }
@@ -197,6 +197,10 @@ NEWLINES       \n+
 {BLANKS}                loc.step();
 {NEWLINES}              loc.lines(yyleng); loc.step();
   /* Built-in function names */
+"exp"                   return yy::parser::make_F_EXP(loc);
+"log"                   return yy::parser::make_F_LOG(loc);
+"log2"                  return yy::parser::make_F_LOG2(loc);
+"log10"                 return yy::parser::make_F_LOG10(loc);
 "sqrt"                  return yy::parser::make_F_SQRT(loc);
 "max"                   return yy::parser::make_F_MAX(loc);
 "min"                   return yy::parser::make_F_MIN(loc);
