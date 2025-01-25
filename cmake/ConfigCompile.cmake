@@ -27,6 +27,7 @@ if(MSVC)
     )
     # enable AddressSanitizer. note that AddressSanitizer does not seem to
     # integrate well with Google Test, so unit test runners may have issues
+    # TODO: set CMake option for this and print on/off status up front
     if(ENABLE_ASAN)
         message(STATUS "Enabling AddressSanitizer (/fsanitize=address)")
         add_compile_options(/fsanitize=address)
