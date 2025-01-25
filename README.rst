@@ -46,9 +46,9 @@ Building from source
 Requires CMake_ >=3.16, Flex >=2.6.2, and Bison >=3.5.1. Flex and Bison can
 either be installed using your system package manager, e.g. for \*nix systems,
 with an alternative being setting either environment or CMake variables with
-the directory locations of Flex and Bison, e.g. ``FLEX_ROOT`` and
-``BISON_ROOT``. On Windows, it is recommended to use WinFlexBison_ to get a
-Flex and Bison release.
+the directory location of Flex and Bison. On Windows, it is recommended to use
+WinFlexBison_, a port of Flex and Bison to Windows, as the original tools were
+designed only for distribution for GNU/Linux style systems.
 
 .. _CMake: https://cmake.org/cmake/help/latest/
 
