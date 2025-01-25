@@ -24,6 +24,22 @@ The calculator parser is built as a separate static or shared library that the
 calculator command-line tool links against. PIMPL is used to provide a stable
 ABI and prevent leaking Flex + Bison generated names and types into user code.
 
+Below is a sample program that demonstrates some of the available features:
+
+.. code::
+
+   a = 1.5;
+   b = sin(1.5) * cos(1.8) + log(a);
+   b += exp(a - b);
+   # non-assignment expressions write result to output stream
+   sqrt(b);
+
+Running the command-line tool on this input should print the following:
+
+.. code::
+
+   <double> 1.98157
+
 Building from source
 --------------------
 
