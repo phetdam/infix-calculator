@@ -40,8 +40,8 @@ Running the command-line tool on this input should print the following:
 
    <double> 1.98157
 
-Building from source
---------------------
+Building + Installing
+---------------------
 
 Requires CMake_ >=3.16, Flex >=2.6.2, and Bison >=3.5.1. Flex and Bison can
 either be installed using your system package manager, e.g. for \*nix systems,
@@ -71,6 +71,18 @@ To build release binaries for this project, simply use the command
 
 Simply typing ``./build.sh`` will build unoptimized binaries with debug symbols.
 
+To install to ``/usr/local``, your prefix of choice, use the command
+
+.. code:: bash
+
+   cmake --install build
+
+For a custom installation root, use the ``--prefix`` argument, e.g.
+
+.. code:: bash
+
+   cmake --install build --prefix /path/to/install/location
+
 Windows
 ~~~~~~~
 
@@ -96,3 +108,9 @@ the ``-a`` flag, e.g. to build 32-bit release binaries instead of the default
    build -a x86 -c Release
 
 Currently, the Visual Studio toolset used will be whichever is the default.
+
+To install to a custom installation root, use the ``--prefix`` argument, e.g.
+
+.. code:: shell
+
+   cmake --install build_windows_x64 --prefix %USERPROFILE%\pdcalc-master
