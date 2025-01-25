@@ -89,7 +89,7 @@ protected:
  *  'l' (108, 0x6C), 'e' (101, 0x65), '.' (46, 0x2E), 'i' (105, 0x69),
  *  'n' (110, 0x6E), '.' (46, 0x2E), '1' (49, 0x31) }` instead. This is not an
  *  issue for Google Test 1.11.0 but to work around this in a consistent manner
- *  we just use `const char*` instead.
+ *  we just use `const char*` instead as the parameter type.
  */
 class CalcParserPureTest
   : public CalcParserTest, public ::testing::WithParamInterface<const char*> {};
@@ -108,7 +108,7 @@ TEST_P(CalcParserPureTest, PureParseTest)
 INSTANTIATE_TEST_SUITE_P(
   BaseSuite,
   CalcParserPureTest,
-  ::testing::Values("sample.in.1", "sample.in.2", "sample.in.3")
+  ::testing::Values("sample.in.1", "sample.in.2", "sample.in.3", "sample.in.4")
 );
 
 }  // namespace
