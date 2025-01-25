@@ -71,6 +71,8 @@
  * We do not need to check if the symbol exists or not as the lexer has already
  * done that for us (symbol is not unknown and is a typed symbol).
  *
+ * @note Safety check is still included but is probably unnecessary.
+ *
  * @param out Semantic value to assign to
  * @param iden Symbol identifier
  * @param type Symbol value C++ type
@@ -85,7 +87,7 @@
       YYABORT; \
     } \
     /* otherwise, assign the value. no need to check type (lexer handled) */ \
-    out = driver.get_symbol(iden)->get<type>(); \
+    out = sym->get<type>(); \
   } \
   while (false)
 %}
@@ -130,6 +132,10 @@
 %token RPAREN ")"
 %token EQUALS "=="
 %token ASSIGN "="
+%token ASSIGN_PLUS "+="
+%token ASSIGN_MINUS "-="
+%token ASSIGN_MULTIPLY "*="
+%token ASSIGN_DIVIDE "/="
 %token AND "&&"
 %token OR "||"
 %token NOT "!"
@@ -259,6 +265,79 @@ stmt:
 | BOOL_IDEN "=" b_expr ";"
   {
     driver.add_symbol($1, $3);
+  }
+/* modifying existing identifiers (note: can result in type change) */
+| LONG_IDEN "+=" i_expr ";"
+  {
+    driver.add_symbol($1, driver.get_symbol($1)->get<long>() + $3);
+  }
+| LONG_IDEN "+=" d_expr ";"
+  {
+    driver.add_symbol($1, driver.get_symbol($1)->get<long>() + $3);
+  }
+| LONG_IDEN "-=" i_expr ";"
+  {
+    driver.add_symbol($1, driver.get_symbol($1)->get<long>() - $3);
+  }
+| LONG_IDEN "-=" d_expr ";"
+  {
+    driver.add_symbol($1, driver.get_symbol($1)->get<long>() - $3);
+  }
+| LONG_IDEN "*=" i_expr ";"
+  {
+    driver.add_symbol($1, driver.get_symbol($1)->get<long>() * $3);
+  }
+| LONG_IDEN "*=" d_expr ";"
+  {
+    driver.add_symbol($1, driver.get_symbol($1)->get<long>() * $3);
+  }
+| LONG_IDEN "/=" i_expr ";"
+  {
+    long res;
+    PDCALC_YY_SAFE_DIVIDE(res, driver.get_symbol($1)->get<long>(), $3);
+    driver.add_symbol($1, res);
+  }
+| LONG_IDEN "/=" d_expr ";"
+  {
+    double res;
+    PDCALC_YY_SAFE_DIVIDE(res, driver.get_symbol($1)->get<long>(), $3);
+    driver.add_symbol($1, res);
+  }
+| DOUBLE_IDEN "+=" i_expr ";"
+  {
+    driver.add_symbol($1, driver.get_symbol($1)->get<double>() + $3);
+  }
+| DOUBLE_IDEN "+=" d_expr ";"
+  {
+    driver.add_symbol($1, driver.get_symbol($1)->get<double>() + $3);
+  }
+| DOUBLE_IDEN "-=" i_expr ";"
+  {
+    driver.add_symbol($1, driver.get_symbol($1)->get<double>() - $3);
+  }
+| DOUBLE_IDEN "-=" d_expr ";"
+  {
+    driver.add_symbol($1, driver.get_symbol($1)->get<double>() - $3);
+  }
+| DOUBLE_IDEN "*=" i_expr ";"
+  {
+    driver.add_symbol($1, driver.get_symbol($1)->get<double>() * $3);
+  }
+| DOUBLE_IDEN "*=" d_expr ";"
+  {
+    driver.add_symbol($1, driver.get_symbol($1)->get<double>() * $3);
+  }
+| DOUBLE_IDEN "/=" i_expr ";"
+  {
+    double res;
+    PDCALC_YY_SAFE_DIVIDE(res, driver.get_symbol($1)->get<double>(), $3);
+    driver.add_symbol($1, res);
+  }
+| DOUBLE_IDEN "/=" d_expr ";"
+  {
+    double res;
+    PDCALC_YY_SAFE_DIVIDE(res, driver.get_symbol($1)->get<double>(), $3);
+    driver.add_symbol($1, res);
   }
 
 /* Integral expression rule */

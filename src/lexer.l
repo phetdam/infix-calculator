@@ -174,8 +174,12 @@ NEWLINES       \n+
   /* Parentheses */
 "("                     return yy::parser::make_LPAREN(loc);
 ")"                     return yy::parser::make_RPAREN(loc);
-  /* Assignment operator */
+  /* Assignment operators (TODO: add some bitwise ones) */
 "="                     return yy::parser::make_ASSIGN(loc);
+"+="                    return yy::parser::make_ASSIGN_PLUS(loc);
+"-="                    return yy::parser::make_ASSIGN_MINUS(loc);
+"*="                    return yy::parser::make_ASSIGN_MULTIPLY(loc);
+"/="                    return yy::parser::make_ASSIGN_DIVIDE(loc);
   /* Known types */
   /* "long"                  return yy::parser::make_T_LONG(loc); */
   /* int used as a synonym for long */

@@ -13,8 +13,8 @@ a = (!a && a) || !a;
 a;
 # <double> 51
 a = 4;
-a = a * 2.5;
-a = a + (4 * a) + 1.;
+a *= 2.5;
+a += (4 * a) + 1.;
 a;
 # <double> 0.5918896673881705
 a = sin(10);
@@ -22,5 +22,10 @@ a = 1.8 * a + cos(1.77 * a);
 a + 1;
 # <double> 0.7980310739375859
 b = sin(1) * cos(a) / tan(a);
-b = sqrt(-b) * sqrt(-a);  # both a, b are negative
+b = sqrt(-b) * sqrt(-a);       # both a, b are negative
 sin(sqrt(b));
+# <double> 0.7733043977140022
+c = sin(1.5);
+c /= 0.67 + c;
+c -= 0.0002;
+sqrt(c);
