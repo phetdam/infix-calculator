@@ -18,7 +18,7 @@ files. Supports boolean, integral, and floating point expressions using standard
 arithmetic and logical operations, with C-style operator precedence. Allows line
 comments within input files and grouping of subexpressions with parentheses.
 Variable assignment is supported and some builtin functions are provided, e.g.
-logarithmic, exponential, trigonometric functions, binary min + max functions.
+logarithmic, exponential, trigonometric, binary min + max.
 
 The calculator parser is built as a separate static or shared library that the
 calculator command-line tool links against. PIMPL is used to provide a stable
