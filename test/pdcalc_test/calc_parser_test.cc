@@ -102,7 +102,7 @@ class CalcParserPureTest
 TEST_P(CalcParserPureTest, PureParseTest)
 {
   pdcalc::calc_parser parser{null_stream};
-  EXPECT_TRUE(parser(test_data_dir_ / GetParam()));
+  EXPECT_TRUE(parser(test_data_dir_ / GetParam())) << parser.last_error();
 }
 
 INSTANTIATE_TEST_SUITE_P(
