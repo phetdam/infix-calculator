@@ -106,11 +106,11 @@ private:
 
 DIGIT          [0-9]
 CHAR           [a-zA-Z]
-CHARS          {CHAR}+
-MAYBE_CHARS    {CHAR}*
+/* CHARS          {CHAR}+ */
+/* MAYBE_CHARS    {CHAR}* */
 ALNUM          [a-zA-Z0-9]
-ALNUMS         {ALNUM}+
-MAYBE_ALNUMS   {ALNUM}*
+/* ALNUMS         {ALNUM}+ */
+/* MAYBE_ALNUMS   {ALNUM}* */
 DIGITS         {DIGIT}+
 MAYBE_DIGITS   {DIGIT}*
 INT            -?{DIGITS}
@@ -118,7 +118,7 @@ INT            -?{DIGITS}
 FLOAT          {INT}"."{MAYBE_DIGITS}
 IDEN           ({CHAR}|_)+({ALNUM}|_)*
 /* If we implement commands in the REPL */
-COMMAND        @{IDEN}
+/* COMMAND        @{IDEN} */
 /* We treat blanks and newlines separately for accurate location tracking, as
  * only newlines result in column being reset and moving to next line. Location
  * is stepped for both blanks and newlines, but newlines increase the number of
@@ -175,7 +175,7 @@ NEWLINES       \n+
 "("                     return yy::parser::make_LPAREN(loc);
 ")"                     return yy::parser::make_RPAREN(loc);
   /* Assignment operator */
-  /* "="                     return yy::parser::make_ASSIGN(loc); */
+"="                     return yy::parser::make_ASSIGN(loc);
   /* Known types */
   /* "long"                  return yy::parser::make_T_LONG(loc); */
   /* int used as a synonym for long */
@@ -201,14 +201,10 @@ NEWLINES       \n+
 "tan"                   return yy::parser::make_F_TAN(loc);
   /* Identifiers */
 {IDEN}                  {
-                          // lookup symbol. if not found, error
+                          // lookup symbol. if not found, unknown identifier
                           auto sym = driver.get_symbol(yytext);
-                          if (!sym) {
-                            throw yy::parser::syntax_error{
-                              loc,
-                              "Undefined symbol '" + std::string{yytext} + "'"
-                            };
-                          }
+                          if (!sym)
+                            return yy::parser::make_UNKNOWN_IDEN(yytext, loc);
                           // otherwise, apply visitor to get correct token
                           pdcalc::symbol_token_visitor vis{yytext, loc};
                           return std::visit(vis, sym->value());

@@ -63,13 +63,13 @@
  * @param iden `std::string` symbol identifier
  */
 #define PDCALC_YY_UNDEFINED_SYMBOL(iden) \
-  error(driver.location_, "Identifier '" + (iden) + "' not defined yet")
+  error(driver.location_, "Undefined symbol '" + (iden) + "'")
 
 /**
- * Check that an identifier corresponds to a symbol and extract its value.
+ * Extract the value of a defined symbol.
  *
- * @todo Can remove this later as the lexer should already check whether or not
- *  a symbol is the `calc_parser_impl` driver symbol table.
+ * We do not need to check if the symbol exists or not as the lexer has already
+ * done that for us (symbol is not unknown and is a typed symbol).
  *
  * @param out Semantic value to assign to
  * @param iden Symbol identifier
@@ -85,7 +85,7 @@
       YYABORT; \
     } \
     /* otherwise, assign the value. no need to check type (lexer handled) */ \
-    out = sym->get<type>(); \
+    out = driver.get_symbol(iden)->get<type>(); \
   } \
   while (false)
 %}
@@ -129,7 +129,7 @@
 %token LPAREN "("
 %token RPAREN ")"
 %token EQUALS "=="
-/* %token ASSIGN "=" */
+%token ASSIGN "="
 %token AND "&&"
 %token OR "||"
 %token NOT "!"
@@ -144,15 +144,12 @@
  *
  * We have typed identifiers, which are intended to be verified by actually
  * looking up the parser table of symbols for the valid identifier. The lexer
- * will perform this lookup using and disambiguate the identifier type.
+ * will perform this lookup to disambiguate the identifier type.
  */
 %token <std::string> BOOL_IDEN
 %token <std::string> LONG_IDEN
 %token <std::string> DOUBLE_IDEN
-/* Type tokens */
-/* %token T_LONG "long" */
-/* %token T_BOOL "bool" */
-/* %token T_DOUBLE "double" */
+%token <std::string> UNKNOWN_IDEN
 /* Built-in function names */
 %token F_SQRT "sqrt"
 %token F_MAX "max"
@@ -200,6 +197,7 @@ input:
  */
 stmt:
   ";"
+/* printing literal expressions */
 | i_expr ";"
   {
     driver.sink() << "<long> " << $1 << std::endl;
@@ -211,6 +209,56 @@ stmt:
 | b_expr ";"
   {
     PDCALC_YY_PRINT_BOOL($1);
+  }
+/* assigning new identifiers */
+| UNKNOWN_IDEN "=" i_expr ";"
+  {
+    driver.add_symbol($1, $3);
+  }
+| UNKNOWN_IDEN "=" d_expr ";"
+  {
+    driver.add_symbol($1, $3);
+  }
+| UNKNOWN_IDEN "=" b_expr ";"
+  {
+    driver.add_symbol($1, $3);
+  }
+/* rebinding existing identifiers (note: can result in type change) */
+| LONG_IDEN "=" i_expr ";"
+  {
+    driver.add_symbol($1, $3);
+  }
+| LONG_IDEN "=" d_expr ";"
+  {
+    driver.add_symbol($1, $3);
+  }
+| LONG_IDEN "=" b_expr ";"
+  {
+    driver.add_symbol($1, $3);
+  }
+| DOUBLE_IDEN "=" i_expr ";"
+  {
+    driver.add_symbol($1, $3);
+  }
+| DOUBLE_IDEN "=" d_expr ";"
+  {
+    driver.add_symbol($1, $3);
+  }
+| DOUBLE_IDEN "=" b_expr ";"
+  {
+    driver.add_symbol($1, $3);
+  }
+| BOOL_IDEN "=" i_expr ";"
+  {
+    driver.add_symbol($1, $3);
+  }
+| BOOL_IDEN "=" d_expr ";"
+  {
+    driver.add_symbol($1, $3);
+  }
+| BOOL_IDEN "=" b_expr ";"
+  {
+    driver.add_symbol($1, $3);
   }
 
 /* Integral expression rule */
