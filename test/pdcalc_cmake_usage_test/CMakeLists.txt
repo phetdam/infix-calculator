@@ -54,3 +54,35 @@ message(
     STATUS
     "pdcalc version: ${pdcalc_VERSION} (requested ${PDCALC_FIND_VERSION})"
 )
+
+# set C++ standards
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# set compile options
+if(MSVC)
+    add_compile_options(/Wall)
+else()
+    add_compile_options(-Wall)
+endif()
+
+include(CTest)
+
+# test: add pdcalc library test program
+add_executable(pdcalc_demo pdcalc_demo.cc)
+target_link_libraries(pdcalc_demo PRIVATE pdcalc::pdcalc)
+# on Windows, copy DLL to build directory if necessary
+if(WIN32)
+    add_custom_command(
+        TARGET pdcalc_demo POST_BUILD
+        COMMAND ${CMAKE_COMMAND}
+                -E copy_if_different
+                $<TARGET_RUNTIME_DLLS:pdcalc_demo> $<TARGET_FILE_DIR:pdcalc_demo>
+        COMMENT "Copying pdcalc_demo runtime DLLs"
+        VERBATIM
+        COMMAND_EXPAND_LISTS
+    )
+endif()
+
+# add CTest test to run the program
+add_test(NAME pdcalc_demo_test COMMAND pdcalc_demo)

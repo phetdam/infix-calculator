@@ -1,0 +1,12 @@
+# pdcalc_demo.in
+#
+# Author: Derek Huang
+# Summary: Input for pdcalc demo program
+# Copyright: MIT License
+#
+
+a = sin(1.5) * (cos(3.4) + tan(9));
+b = a * exp(-a);
+b *= 0.5 + (-a);
+c = a + b - (0.5 * a) / (a * b);
+a + b + c;
