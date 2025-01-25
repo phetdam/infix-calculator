@@ -114,3 +114,61 @@ To install to a custom installation root, use the ``--prefix`` argument, e.g.
 .. code:: shell
 
    cmake --install build_windows_x64 --prefix %USERPROFILE%\pdcalc-master
+
+Usage from CMake
+----------------
+
+After build + installation, the calculator parser library can be used from
+CMake in the normal fashion with CMake's find_package_ command. To locate the
+library, use the following in a ``CMakeLists.txt`` or CMake script:
+
+.. _find_package: https://cmake.org/cmake/help/latest/command/find_package.html
+
+.. code:: cmake
+
+   find_package(pdcalc 0.1.0)
+
+If the library is found, one can write programs using the headers, for example:
+
+.. code:: cpp
+
+   /**
+    * @file pdcalc_ex.cc
+    * @author Derek Huang
+    * @brief C++ minimal example using pdcalc
+    * @copyright MIT License
+    */
+
+   #include <filesystem>
+
+   #include <pdcalc/calc_parser.hh>  // note: no main API header yet
+
+   int main()
+   {
+     // read input from stdin and write to stdout (returns true on success)
+     pdcalc::calc_parser parser;
+     return !parser();
+   }
+
+Then, when adding the CMake target for this program, one can to specify the
+compile + link requirements simply via use of target_link_libraries_ without
+needing to manually update the include or link directories for the project or
+target. For example:
+
+.. code:: cmake
+
+   add_executable(pdcalc_ex pdcalc_ex.cc)
+   target_link_libraries(pdcalc_ex PRIVATE pdcalc::pdcalc)
+
+On a \*nix system, assuming the build directory is ``build``, one can run the
+produced example program as follows:
+
+.. code:: bash
+
+   echo "a = sin(1.9); tan(exp(-a));" | ./build/pdcalc_ex
+
+The following should then be written to standard output:
+
+.. code::
+
+   <double> 0.408923
