@@ -102,12 +102,6 @@ else()
     message(STATUS "PIMPL method: unique_ptr")
 endif()
 
-# find Flex and Bison
-find_package(FLEX 2.6.2 REQUIRED)
-message(STATUS "Flex version: ${FLEX_VERSION}")
-find_package(BISON 3.5.1 REQUIRED)
-message(STATUS "Bison version: ${BISON_VERSION}")
-
 # current top-level build directory
 set(PDCALC_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -123,6 +117,18 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# find Flex and Bison
+find_package(FLEX 2.6.2 REQUIRED)
+message(STATUS "Flex version: ${FLEX_VERSION}")
+find_package(BISON 3.5.1 REQUIRED)
+message(STATUS "Bison version: ${BISON_VERSION}")
+# find Doxygen
+find_package(Doxygen 1.9.0)
+if(Doxygen_FOUND)
+    message(STATUS "Doxygen version: ${DOXYGEN_VERSION}")
+else()
+    message(STATUS "Doxygen version: None")
+endif()
 # find Google Test version >= than min. requested version
 set(PDCALC_GTEST_VERSION)
 find_package(GTest ${PDCALC_GTEST_VERSION})
