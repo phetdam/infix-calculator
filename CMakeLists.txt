@@ -1,22 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-##
-# Build instructions
-#
-# Note: The following build instructions are out of date.
-#
-# It is assumed that Flex and Bison have been appropriately installed on your
-# *nix system through your system package manager. On Windows, it's easiest to
-# get a WinFlexBison release and define PDCALC_FLEX_PATH and PDCALC_BISON_PATH
-# in the CMake generate command. Alternatively, you can manually update your
-# PATH with the WinFlexBison release install directory.
-#
-# Windows:
-#   cmake -S . -B build_windows -G Ninja && cmake --build build_windows -j
-#
-# *nix:
-#   cmake -S . -B build && cmake --build build -j
-#
+# see README.rst for build instructions
 
 project(
     pdcalc
