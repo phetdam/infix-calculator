@@ -151,7 +151,7 @@ If the library is found, one can write programs using the headers, for example:
    }
 
 Then, when adding the CMake target for this program, one can to specify the
-compile + link requirements simply via use of target_link_libraries_ without
+compile + link requirements simply via use of `target_link_libraries`_ without
 needing to manually update the include or link directories for the project or
 target. For example:
 
