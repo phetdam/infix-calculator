@@ -65,7 +65,19 @@ public:
    */
   bool parse(bool enable_trace = false)
   {
-    return parse("", enable_trace);
+    return parse(enable_trace, enable_trace);
+  }
+
+  /**
+   * Parse input from `stdin`.
+   *
+   * @param trace_lexer `true` to enable lexer tracing
+   * @param trace_parser `true` to enable parser tracing
+   * @returns `true` on success, `false` on failure
+   */
+  bool parse(bool trace_lexer, bool trace_parser)
+  {
+    return parse("", trace_lexer, trace_parser);
   }
 
   /**
@@ -102,6 +114,18 @@ public:
   auto operator()(bool enable_trace = false)
   {
     return parse(enable_trace);
+  }
+
+  /**
+   * Parse input from `stdin`.
+   *
+   * @param trace_lexer `true` to enable lexer tracing
+   * @param trace_parser `true` to enable parser tracing
+   * @returns `true` on success, `false` on failure
+   */
+  auto operator()(bool trace_lexer, bool trace_parser)
+  {
+    return parse(trace_lexer, trace_parser);
   }
 
   /**

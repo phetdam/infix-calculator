@@ -250,16 +250,15 @@ int main(int argc, char** argv)
     std::cout << program_version_info << std::endl;
     return EXIT_SUCCESS;
   }
+  // get lexer + parser trace flags
+  bool trace_lexer = opt_map.find("trace_lexer") != opt_map.end();
+  bool trace_parser = opt_map.find("trace_parser") != opt_map.end();
   // process input files
   if (opt_map.find("file") != opt_map.end())
-    return parse_files(
-      opt_map.at("file"),
-      opt_map.find("trace_lexer") != opt_map.end(),
-      opt_map.find("trace_parser") != opt_map.end()
-    );
+    return parse_files(opt_map.at("file"), trace_lexer, trace_parser);
   // otherwise, parse input from stdin
   pdcalc::calc_parser parser;
-  if (!parser()) {
+  if (!parser(trace_lexer, trace_parser)) {
     std::cerr << progname << ": " << parser.last_error() << std::endl;
     return EXIT_FAILURE;
   }
