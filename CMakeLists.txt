@@ -195,6 +195,9 @@ endif()
 # both single- and multi-config generators may have config-independent includes
 include_directories(${PDCALC_BINARY_DIR}/include)
 
+# CMake files relative install prefix
+set(PDCALC_CMAKE_PREFIX lib/cmake/pdcalc)
+
 # add src, test (only some tests use Google Test)
 add_subdirectory(src)
 add_subdirectory(test)
@@ -205,7 +208,7 @@ set(PDCALC_CONFIG_FILE pdcalc-config.cmake)
 configure_package_config_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PDCALC_CONFIG_FILE}.in
     ${CMAKE_CURRENT_BINARY_DIR}/${PDCALC_CONFIG_FILE}
-    INSTALL_DESTINATION cmake/pdcalc
+    INSTALL_DESTINATION ${PDCALC_CMAKE_PREFIX}
 )
 # configure version selection file
 set(PDCALC_CONFIG_VERSION_FILE pdcalc-config-version.cmake)
@@ -219,5 +222,5 @@ install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PDCALC_CONFIG_FILE}
         ${CMAKE_CURRENT_BINARY_DIR}/${PDCALC_CONFIG_VERSION_FILE}
-    DESTINATION lib/cmake/pdcalc
+    DESTINATION ${PDCALC_CMAKE_PREFIX}
 )
