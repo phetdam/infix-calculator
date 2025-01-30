@@ -43,12 +43,12 @@ elseif(Git_FOUND)
     # failed
     if(_cur_rev_res)
         message(WARNING "git rev-list failed; using -DEV as build tag")
-    # otherwise, use output
+    # otherwise, use + print output
     else()
         set(PDCALC_VERSION_INFO "-${_cur_rev}")
+        message(STATUS "Build tag: ${PDCALC_VERSION_INFO}")
     endif()
-    # print and unset temps
-    message(STATUS "Build tag: ${PDCALC_VERSION_INFO}")
+    # unset temps
     unset(_cur_rev_res)
     unset(_cur_rev)
 endif()
