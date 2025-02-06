@@ -161,7 +161,7 @@ a ``CMakeLists.txt`` is the following:
 .. code:: cmake
 
    add_executable(pdcalc_ex pdcalc_ex.cc)
-   target_link_libraries(pdcalc_ex PRIVATE pdcalc::pdcalc)
+   target_link_libraries(pdcalc_ex PRIVATE pdcalc::libpdcalc)
 
 On a \*nix system, assuming the build directory is ``build``, one can run the
 produced example program as follows:

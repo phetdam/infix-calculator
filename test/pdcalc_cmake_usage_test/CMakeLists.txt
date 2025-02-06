@@ -70,7 +70,7 @@ include(CTest)
 
 # test: add pdcalc library test program
 add_executable(pdcalc_demo pdcalc_demo.cc)
-target_link_libraries(pdcalc_demo PRIVATE pdcalc::pdcalc)
+target_link_libraries(pdcalc_demo PRIVATE pdcalc::libpdcalc)
 # on Windows, copy DLL to build directory if necessary
 if(WIN32)
     add_custom_command(

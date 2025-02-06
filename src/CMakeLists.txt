@@ -50,7 +50,7 @@ endif()
 
 # pdcalc library implementing parser
 add_library(
-    pdcalc_lib
+    libpdcalc
         # note: could use FLEX_pdcalc_lexer_OUTPUTS and
         # BISON_pdcalc_parser_OUTPUTS but we only care about the source files
         ${PDCALC_LEXER_OUTPUT}
@@ -59,39 +59,38 @@ add_library(
         calc_parser_impl.cc
 )
 set_target_properties(
-    pdcalc_lib PROPERTIES
-    # both exported target name and output file are just pdcalc
-    EXPORT_NAME pdcalc
-    OUTPUT_NAME pdcalc
+    libpdcalc PROPERTIES
+    # no extra "lib" prefix on any platform
+    PREFIX ""
     DEFINE_SYMBOL PDCALC_BUILD_DLL
     # add "d" suffix for debug libraries
     DEBUG_POSTFIX d
 )
 # when building shared PDCALC_DLL is part of the compile interface
 if(BUILD_SHARED_LIBS)
-    target_compile_definitions(pdcalc_lib PUBLIC PDCALC_DLL)
+    target_compile_definitions(libpdcalc PUBLIC PDCALC_DLL)
 endif()
 # if using raw PIMPL then PDCALC_RAW_PIMPL is part of the compile interface
 if(PDCALC_RAW_PIMPL)
-    target_compile_definitions(pdcalc_lib PUBLIC PDCALC_RAW_PIMPL)
+    target_compile_definitions(libpdcalc PUBLIC PDCALC_RAW_PIMPL)
 endif()
 # need to add current directory to includes for calc_parser_impl.hh and add
 # the src subdir of the build root for parser.yy.h
 target_include_directories(
-    pdcalc_lib PRIVATE
+    libpdcalc PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR} ${PDCALC_BINARY_DIR}/src
 )
 # include directories interface changes based on build vs. install
 target_include_directories(
-    pdcalc_lib PUBLIC
+    libpdcalc PUBLIC
     $<BUILD_INTERFACE:${PDCALC_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:include>
 )
 # for multi-config generators config header generation is a pre-build step
 if(PDCALC_IS_MULTI_CONFIG)
-    add_dependencies(pdcalc_lib pdcalc_config_hh)
+    add_dependencies(libpdcalc pdcalc_config_hh)
 endif()
-# set public headers for pdcalc_lib
+# set public headers for libpdcalc
 set(
     PDCALC_PUBLIC_HEADERS
     ${PDCALC_INCLUDE_DIR}/pdcalc/calc_parser.hh
@@ -102,41 +101,45 @@ set(
     ${PDCALC_INCLUDE_DIR}/pdcalc/warnings.h
 )
 set_target_properties(
-    pdcalc_lib PROPERTIES
+    libpdcalc PROPERTIES
     # must expand as semicolon-separated string
     PUBLIC_HEADER "${PDCALC_PUBLIC_HEADERS}"
 )
-# installation rule + export installation rule
+
+# pdcalc CLI frontend
+add_executable(pdcalc main.cc)
+target_link_libraries(pdcalc PRIVATE libpdcalc)
+set_target_properties(
+    pdcalc PROPERTIES
+    # target export name is just pdcalc and output name is also pdcalc
+    EXPORT_NAME pdcalc
+    OUTPUT_NAME pdcalc
+)
+
+# installation rule for targets + export installation rule
 install(
-    TARGETS pdcalc_lib
-    EXPORT pdcalc_lib_export
+    TARGETS libpdcalc pdcalc
+    EXPORT pdcalc_exports
     PUBLIC_HEADER DESTINATION include/pdcalc
 )
 install(
-    EXPORT pdcalc_lib_export
+    EXPORT pdcalc_exports
     DESTINATION lib/cmake/pdcalc
     NAMESPACE pdcalc::
     FILE pdcalc-targets.cmake
 )
 
-# pdcalc CLI frontend
-add_executable(pdcalc_bin main.cc)
-target_link_libraries(pdcalc_bin PRIVATE pdcalc_lib)
-set_target_properties(pdcalc_bin PROPERTIES OUTPUT_NAME pdcalc)
-# installation rule
-install(TARGETS pdcalc_bin)
-
 # -h, --help option tests
-add_test(NAME pdcalc_h COMMAND pdcalc_bin -h)
-add_test(NAME pdcalc_help COMMAND pdcalc_bin --help)
+add_test(NAME pdcalc_h COMMAND pdcalc -h)
+add_test(NAME pdcalc_help COMMAND pdcalc --help)
 set_tests_properties(
     pdcalc_h pdcalc_help PROPERTIES
     # just the summary line of the usage text
     PASS_REGULAR_EXPRESSION "A statement-based infix calculator"
 )
 # -V, --version option tests
-add_test(NAME pdcalc_V COMMAND pdcalc_bin -V)
-add_test(NAME pdcalc_version COMMAND pdcalc_bin --version)
+add_test(NAME pdcalc_V COMMAND pdcalc -V)
+add_test(NAME pdcalc_version COMMAND pdcalc --version)
 set_tests_properties(
     pdcalc_V pdcalc_version PROPERTIES
     # should have the version info printed
@@ -145,11 +148,11 @@ set_tests_properties(
 # invalid options
 add_test(
     NAME pdcalc_badopt
-    COMMAND pdcalc_bin -badopt ${PDCALC_TEST_DATA_DIR}/sample.in.2
+    COMMAND pdcalc -badopt ${PDCALC_TEST_DATA_DIR}/sample.in.2
 )
 add_test(
     NAME pdcalc_longbadopt
-    COMMAND pdcalc_bin --longbadopt ${PDCALC_TEST_DATA_DIR}/sample.in.2
+    COMMAND pdcalc --longbadopt ${PDCALC_TEST_DATA_DIR}/sample.in.2
 )
 set_tests_properties(
     pdcalc_badopt pdcalc_longbadopt PROPERTIES
@@ -158,48 +161,48 @@ set_tests_properties(
 # test running with trace options
 add_test(
     NAME pdcalc_t
-    COMMAND pdcalc_bin -t ${PDCALC_TEST_DATA_DIR}/sample.in.1
+    COMMAND pdcalc -t ${PDCALC_TEST_DATA_DIR}/sample.in.1
 )
 add_test(
     NAME pdcalc_trace
-    COMMAND pdcalc_bin --trace ${PDCALC_TEST_DATA_DIR}/sample.in.2
+    COMMAND pdcalc --trace ${PDCALC_TEST_DATA_DIR}/sample.in.2
 )
 add_test(
     NAME pdcalc_tl
-    COMMAND pdcalc_bin -tl ${PDCALC_TEST_DATA_DIR}/sample.in.1
+    COMMAND pdcalc -tl ${PDCALC_TEST_DATA_DIR}/sample.in.1
 )
 add_test(
     NAME pdcalc_tp
-    COMMAND pdcalc_bin -tp ${PDCALC_TEST_DATA_DIR}/sample.in.2
+    COMMAND pdcalc -tp ${PDCALC_TEST_DATA_DIR}/sample.in.2
 )
 add_test(
     NAME pdcalc_tlp
-    COMMAND pdcalc_bin -tlp ${PDCALC_TEST_DATA_DIR}/sample.in.3
+    COMMAND pdcalc -tlp ${PDCALC_TEST_DATA_DIR}/sample.in.3
 )
 add_test(
     NAME pdcalc_trace_lexer
-    COMMAND pdcalc_bin --trace=lexer ${PDCALC_TEST_DATA_DIR}/sample.in.1
+    COMMAND pdcalc --trace=lexer ${PDCALC_TEST_DATA_DIR}/sample.in.1
 )
 add_test(
     NAME pdcalc_trace_parser
-    COMMAND pdcalc_bin --trace=parser ${PDCALC_TEST_DATA_DIR}/sample.in.2
+    COMMAND pdcalc --trace=parser ${PDCALC_TEST_DATA_DIR}/sample.in.2
 )
 add_test(
     NAME pdcalc_trace_lexer_parser
-    COMMAND pdcalc_bin --trace=lexer,parser ${PDCALC_TEST_DATA_DIR}/sample.in.3
+    COMMAND pdcalc --trace=lexer,parser ${PDCALC_TEST_DATA_DIR}/sample.in.3
 )
 # test running with bad trace options
 add_test(
     NAME pdcalc_tX
-    COMMAND pdcalc_bin -tX ${PDCALC_TEST_DATA_DIR}/sample.in.1
+    COMMAND pdcalc -tX ${PDCALC_TEST_DATA_DIR}/sample.in.1
 )
 add_test(
     NAME pdcalc_tXx
-    COMMAND pdcalc_bin -tXx ${PDCALC_TEST_DATA_DIR}/sample.in.2
+    COMMAND pdcalc -tXx ${PDCALC_TEST_DATA_DIR}/sample.in.2
 )
 add_test(
     NAME pdcalc_tpX
-    COMMAND pdcalc_bin -tpX ${PDCALC_TEST_DATA_DIR}/sample.in.3
+    COMMAND pdcalc -tpX ${PDCALC_TEST_DATA_DIR}/sample.in.3
 )
 set_tests_properties(
     pdcalc_tX pdcalc_tXx pdcalc_tpX PROPERTIES
