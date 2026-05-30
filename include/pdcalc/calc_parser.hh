@@ -169,10 +169,10 @@ private:
 #else
   // MSVC emits C4251 complaining that DLL-interface is needed. we're already
   // using PIMPL, anything else STL-related is a Microsoft problem
-  PDCALC_MSVC_WARNING_PUSH()
-  PDCALC_MSVC_WARNING_DISABLE(4251)
+PDCALC_MSVC_WARNING_PUSH()
+PDCALC_MSVC_WARNING_DISABLE(4251)
   std::unique_ptr<calc_parser_impl> impl_;
-  PDCALC_MSVC_WARNING_POP()
+PDCALC_MSVC_WARNING_POP()
 #endif  // !defined(PDCALC_RAW_PIMPL)
 };
 
