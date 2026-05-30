@@ -17,3 +17,5 @@
 *.yy.cc
 *.yy.h
 location.hh
+# ignore Vim swap files
+*.swp
