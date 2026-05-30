@@ -44,7 +44,7 @@ protected:
     // not a directory
     else if (!std::filesystem::is_directory(test_data_dir_))
       skip_reason_ = PDCALC_TEST_DATA_DIR_MESSAGE " is not a directory";
-#undef PDCALC_TETS_DATA_DIR_MESSAGE
+#undef PDCALC_TEST_DATA_DIR_MESSAGE
   }
 
   /**
