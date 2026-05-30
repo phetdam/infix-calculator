@@ -5,12 +5,12 @@
  * @copyright MIT License
  */
 
-#include "calc_parser_impl.hh"
+#include "calc_parser_impl.hh"    // includes parser.yy.h
 
 #include <filesystem>
 #include <string_view>
 
-#include "pdcalc/calc_symbol.hh"  // includes parser.yy.h
+#include "pdcalc/calc_symbol.hh"
 
 namespace pdcalc {
 
